@@ -3,13 +3,17 @@ from pathlib import Path
 from crewai import Agent, Task, Crew, Process
 from crewai.project import CrewBase, agent, task, crew
 from dotenv import load_dotenv
-from src.komet_content_intelligence.tools.proof_library import ProofLibraryTool
+from komet_content_intelligence.tools.proof_library import ProofLibraryTool
 
 load_dotenv()
 
 
 def load_brand_config(brand: str = "komet") -> dict:
-    config_path = Path(__file__).parent.parent.parent / f"config/brands/{brand}.yaml"
+    # Try multiple paths — local dev vs AMP deployment
+    for base in [Path(__file__).parent.parent.parent, Path.cwd()]:
+        config_path = base / f"config/brands/{brand}.yaml"
+        if config_path.exists():
+            break
     with open(config_path) as f:
         return yaml.safe_load(f)
 

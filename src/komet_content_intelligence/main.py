@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-from src.komet_content_intelligence.crew import KometContentIntelligenceCrew
+from komet_content_intelligence.crew import KometContentIntelligenceCrew
 
 
 def run():
