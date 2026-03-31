@@ -1,0 +1,172 @@
+strategy_task:
+  description: >
+    Using the content brief ({content_brief}), brand config, and proof library,
+    produce a strategy document with:
+    1. Single best angle with ICP rationale
+    2. Three hook options (problem-first, counterintuitive, pattern-based)
+    3. Argument structure: problem → evidence → pattern/fix → CTA
+    4. Proof items to use: MS or P reference IDs, claimable vs background
+    5. Offer mapping (A, B, or C) and specific CTA variant
+    6. Content format: LinkedIn post or blog article
+    7. Image direction: single image or carousel, and what it should show
+    8. AGENTFORCE FLAG: if topic involves Agentforce, state AGENTFORCE_TOPIC=true
+  expected_output: >
+    Structured strategy brief in markdown. All 8 sections complete.
+    Specific enough that the Writer needs zero interpretation.
+  agent: content_strategist
+
+writing_task:
+  description: >
+    Write the COMPLETE CONTENT PACKAGE from the strategy brief. Not a draft.
+    Not a post. A complete, structured package with every required field populated.
+
+    Apply all brand voice rules: AU English, no banned phrases, short paragraphs
+    (1-3 lines), concrete outcomes over abstract claims. Never use proof beyond
+    what the brief specifies as claimable. Follow structural templates in
+    config/templates/content_templates.md exactly for the correct content type.
+
+    If strategy brief contains AGENTFORCE_TOPIC=true, include AGENTFORCE_CONTENT
+    flag at the top. Tie every Agentforce claim to a documented Salesforce feature.
+
+    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+    LINKEDIN PACKAGE — ALL FIELDS MANDATORY
+    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+    ## FINAL POST
+    [publishable post — hook + body + CTA, 800-1300 characters, AU English]
+
+    ## ALTERNATE HOOK 1
+    [different angle on the same topic — problem-first or counterintuitive]
+
+    ## ALTERNATE HOOK 2
+    [different style — pattern reveal or bold statement]
+
+    ## ALTERNATE CTA
+    [different offer framing or different offer mapping]
+
+    ## FOLLOW-UP COMMENT 1
+    [post within first hour — adds a specific detail or data point]
+
+    ## FOLLOW-UP COMMENT 2
+    [post within first hour — poses a question to drive engagement]
+
+    ## FOLLOW-UP COMMENT 3
+    [post within first hour — links to related Komet pattern or resource]
+
+    ## IMAGE BRIEF
+    [exact description: image type, what it shows, text overlay if any,
+     tone — professional/authoritative, dark navy + teal palette, B2B not lifestyle]
+
+    ## RATIONALE
+    [2-3 sentences: why this angle works for this ICP at this funnel stage]
+
+    ## PROOF USED
+    [list proof item IDs referenced and how each was used — claimable or context only]
+
+    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+    BLOG PACKAGE — ALL FIELDS MANDATORY
+    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+    ## ARTICLE
+    [full article — minimum 700 words, structured per template in content_templates.md]
+
+    ## SEO TITLE
+    [under 60 characters — target keyword in first 3 words]
+
+    ## META DESCRIPTION
+    [under 160 characters — target keyword included, problem + solution hint]
+
+    ## LINKEDIN DERIVATIVE POST
+    [150-200 word LinkedIn post based on the article — different angle to the title]
+
+    ## REPURPOSED SNIPPET 1
+    [standalone insight from article suitable for a future LinkedIn post]
+
+    ## REPURPOSED SNIPPET 2
+    [standalone insight from a different section — practical or data-backed]
+
+    ## REPURPOSED SNIPPET 3
+    [checklist-style or framework insight from article]
+
+    ## IMAGE BRIEF
+    [hero image description — professional B2B context, dark navy + teal, no lifestyle]
+
+    ## PROOF USED
+    [list proof item IDs referenced and how each was used — claimable or context only]
+
+    A task is NOT complete unless every section above is populated.
+    Returning only the post or only the article is an automatic failure.
+
+  expected_output: >
+    Complete content package in structured markdown with every section header
+    present and populated. No section may be empty, marked "TBD", or skipped.
+    AGENTFORCE_CONTENT flag at top if applicable.
+    Package completeness is verified before passing to Critic.
+  agent: content_writer
+  context: [strategy_task]
+
+critique_task:
+  description: >
+    STEP 1 — PACKAGE COMPLETENESS CHECK (before quality scoring).
+    Verify every required section is present and populated:
+
+    LinkedIn must have: FINAL POST, ALTERNATE HOOK 1, ALTERNATE HOOK 2,
+    ALTERNATE CTA, FOLLOW-UP COMMENT 1, FOLLOW-UP COMMENT 2, FOLLOW-UP COMMENT 3,
+    IMAGE BRIEF, RATIONALE, PROOF USED.
+
+    Blog must have: ARTICLE (700+ words), SEO TITLE, META DESCRIPTION,
+    LINKEDIN DERIVATIVE POST, REPURPOSED SNIPPET 1, REPURPOSED SNIPPET 2,
+    REPURPOSED SNIPPET 3, IMAGE BRIEF, PROOF USED.
+
+    If any section is missing or empty: FAIL immediately with
+    "INCOMPLETE PACKAGE — missing: [list of missing sections]".
+    Return to Writer. This counts as one of the 2 allowed revision loops.
+
+    STEP 2 — QUALITY SCORING (only if package is complete).
+    Score each QA dimension 0-5:
+    A. Buyer relevance (threshold: 4)
+    B. Specificity (threshold: 4)
+    C. Evidence and integrity (threshold: 4 — hard floor)
+    D. Practicality (threshold: 4)
+    E. Voice consistency (threshold: 4 — hard floor)
+    F. Education resonance (threshold: 4 for education-tagged content)
+
+    If average < 4.0 or any hard floor < 4: return numbered revision list
+    with specific fixes — not vague feedback. Max 2 total loops.
+
+    If passes: output approved content package with QA scorecard table attached.
+    Preserve AGENTFORCE_CONTENT flag if present.
+  expected_output: >
+    INCOMPLETE: list of missing sections — return to Writer immediately.
+    FAIL: numbered revision list with QA scores per dimension.
+    PASS: complete content package with QA scorecard appended.
+    AGENTFORCE_CONTENT flag preserved throughout.
+  agent: content_critic
+  context: [writing_task]
+
+brand_check_task:
+  description: >
+    STEP 1 — FINAL PACKAGE COMPLETENESS CONFIRMATION.
+    Before any brand check, confirm the package is complete.
+    If the Critic passed an incomplete package: FAIL immediately with
+    "PIPELINE ERROR — incomplete package passed brand check".
+
+    STEP 2 — HARD RULES CHECK.
+    1. AU English (enrolment, organisation, programme where appropriate)
+    2. Banned phrases — scan every line of every section
+    3. CTA in FINAL POST maps to a specific Komet offer with exact wording
+    4. All claims in all sections have proof reference or labelled opinion/hypothesis
+    5. Every section sounds like a founder-operator — not AI-generated filler
+    6. Follow-up comments are genuinely useful, not generic engagement bait
+    7. Image brief is specific enough to brief a designer
+    8. Agentforce content: verify no claims exceed official Salesforce documentation.
+       If overclaiming detected: FAIL with specific line and rule.
+
+    Output status: APPROVED | FAIL only.
+    On APPROVED: complete package passes to Nick for final review.
+    On FAIL: specific line, section name, and rule broken.
+  expected_output: >
+    APPROVED: complete content package with APPROVED status — all sections intact,
+    ready for Nick's approval gate in AMP.
+    FAIL: specific failure with section name, line reference, and rule broken.
+  agent: brand_guardian
+  context: [critique_task]
+  output_file: "outputs/content_pack.md"
