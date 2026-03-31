@@ -16,8 +16,6 @@ from komet_content_intelligence.tools.wordpress_publisher import WordPressPublis
 from komet_content_intelligence.tools.linkedin_publisher import LinkedInPublisherTool
 
 # Configure Claude with generous max_tokens for long content packages
-# Blog articles alone need 1500-2500 words (~2000-3500 tokens) plus all
-# other sections. 32768 ensures nothing truncates.
 claude_llm = LLM(
     model="anthropic/claude-sonnet-4-6",
     max_tokens=32768,
@@ -25,7 +23,6 @@ claude_llm = LLM(
 
 
 def load_brand_config(brand: str = "komet") -> dict:
-    # Try multiple paths — local dev vs AMP deployment
     for base in [Path(__file__).parent.parent.parent, Path.cwd()]:
         config_path = base / f"config/brands/{brand}.yaml"
         if config_path.exists():
@@ -36,15 +33,13 @@ def load_brand_config(brand: str = "komet") -> dict:
 
 @CrewBase
 class KometContentIntelligenceCrew:
-    """Komet Content Production Crew — generates and QA-checks content packages"""
+    """Komet Content Production Crew"""
     agents_config = "config/agents.yaml"
     tasks_config = "config/tasks.yaml"
 
     def __init__(self, brand: str = "komet"):
         self.brand_config = load_brand_config(brand)
         self.proof_tool = ProofLibraryTool()
-        self.wp_tool = WordPressPublisherTool()
-        self.li_tool = LinkedInPublisherTool()
 
     @agent
     def content_strategist(self) -> Agent:
@@ -79,15 +74,6 @@ class KometContentIntelligenceCrew:
             llm=claude_llm,
         )
 
-    @agent
-    def content_publisher(self) -> Agent:
-        return Agent(
-            config=self.agents_config["content_publisher"],
-            tools=[self.wp_tool, self.li_tool],
-            verbose=True,
-            llm=claude_llm,
-        )
-
     @task
     def strategy_task(self) -> Task:
         return Task(config=self.tasks_config["strategy_task"])
@@ -104,7 +90,7 @@ class KometContentIntelligenceCrew:
     def brand_check_task(self) -> Task:
         return Task(
             config=self.tasks_config["brand_check_task"],
-            human_input=True,
+            output_file="outputs/content_pack.md",
         )
 
     @crew
