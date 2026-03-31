@@ -69,7 +69,10 @@ writing_task:
     BLOG PACKAGE — ALL FIELDS MANDATORY (if format = blog article)
     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
     ## ARTICLE
-    [full article — minimum 700 words, structured per template in content_templates.md]
+    [full article — 1500-2500 words for SEO/AEO depth. Structure per template in
+     content_templates.md. Include H2/H3 subheadings for scannability and featured
+     snippet eligibility. Answer FAQ questions from the content brief directly in
+     the article body where natural — these feed AI overview citations.]
 
     ## SEO TITLE
     [under 60 characters — target keyword in first 3 words]
@@ -117,7 +120,7 @@ critique_task:
     ALTERNATE CTA, FOLLOW-UP COMMENT 1, FOLLOW-UP COMMENT 2, FOLLOW-UP COMMENT 3,
     IMAGE BRIEF, RATIONALE, PROOF USED.
 
-    Blog must have: ARTICLE (700+ words), SEO TITLE, META DESCRIPTION,
+    Blog must have: ARTICLE (1500-2500 words), SEO TITLE, META DESCRIPTION,
     LINKEDIN DERIVATIVE POST, REPURPOSED SNIPPET 1, REPURPOSED SNIPPET 2,
     REPURPOSED SNIPPET 3, IMAGE BRIEF, PROOF USED.
 
