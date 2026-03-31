@@ -1,7 +1,16 @@
-import os
-import gspread
-from google.oauth2.service_account import Credentials
+import yaml
+from pathlib import Path
 from crewai.tools import BaseTool
+
+
+def _load_proof_data() -> dict:
+    """Load proof library from YAML config."""
+    for base in [Path(__file__).parent.parent.parent.parent, Path.cwd()]:
+        path = base / "config" / "proof_library.yaml"
+        if path.exists():
+            with open(path) as f:
+                return yaml.safe_load(f)
+    raise FileNotFoundError("config/proof_library.yaml not found")
 
 
 class ProofLibraryTool(BaseTool):
@@ -15,34 +24,32 @@ class ProofLibraryTool(BaseTool):
     """
 
     def _run(self, proof_ids: str) -> str:
-        creds_path = os.getenv("GOOGLE_SHEETS_CREDENTIALS_PATH")
-        sheet_id = os.getenv("GOOGLE_SHEETS_ID")
+        data = _load_proof_data()
 
-        scopes = [
-            "https://spreadsheets.google.com/feeds",
-            "https://www.googleapis.com/auth/drive"
-        ]
-        creds = Credentials.from_service_account_file(creds_path, scopes=scopes)
-        client = gspread.authorize(creds)
-        sheet = client.open_by_key(sheet_id).worksheet("Proof Library")
-        records = sheet.get_all_records()
+        # Build lookup from both sections
+        lookup = {}
+        for section_key in ["micro_stories", "patterns"]:
+            section = data.get(section_key, {})
+            if section:
+                lookup.update(section)
 
         requested_ids = [pid.strip() for pid in proof_ids.split(",")]
         results = []
 
-        for record in records:
-            proof_id = record.get("ID", "")
-            if proof_id in requested_ids:
+        for pid in requested_ids:
+            item = lookup.get(pid)
+            if item:
                 results.append(
-                    f"ID: {proof_id}\n"
-                    f"Type: {record.get('Type', '')}\n"
-                    f"CLAIMABLE: {record.get('Claimable', '')}\n"
-                    f"BACKGROUND ONLY: {record.get('Background', '')}\n"
-                    f"Anonymisation: {record.get('Anonymisation Level', '')}\n"
+                    f"ID: {pid}\n"
+                    f"Type: {item.get('type', '')}\n"
+                    f"Title: {item.get('title', '')}\n"
+                    f"CLAIMABLE: {item.get('claimable', '').strip()}\n"
+                    f"BACKGROUND ONLY: {item.get('background', '').strip()}\n"
+                    f"Anonymisation: {item.get('anonymisation', '')}\n"
+                    f"Tags: {', '.join(item.get('tags', []))}\n"
                     "---"
                 )
-
-        if not results:
-            return f"No proof items found for IDs: {proof_ids}"
+            else:
+                results.append(f"ID: {pid} — NOT FOUND in proof library\n---")
 
         return "\n".join(results)

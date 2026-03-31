@@ -1,0 +1,218 @@
+# Komet Proof Library
+# Each item has: id, type, claimable (can be quoted/cited in published content),
+# background (informs tone/angle but cannot be directly cited),
+# anonymisation level, and tags for matching to topics.
+#
+# Claimable = safe to reference directly in published posts
+# Background = use to inform angle/framing only, never quote or cite
+#
+# To add new items: append to the relevant section below.
+# To sync from Google Sheets: run scripts/sync_proof_library.py (future)
+
+micro_stories:
+  MS-01:
+    type: micro_story
+    title: "Lead routing fix for AU private college"
+    claimable: >
+      An Australian private college reduced enquiry response time from
+      48+ hours to under 2 hours by implementing automated lead routing
+      and ownership rules in Sales Cloud. Admissions team stopped losing
+      leads between web form and first contact.
+    background: >
+      College had 3 campuses, ~2000 enrolments/year. Previously used shared
+      inbox for all enquiries. No attribution, no SLA tracking. Salesforce
+      was installed but admissions team reverted to spreadsheets within
+      60 days of go-live because pipeline stages didn't match their process.
+    anonymisation: "fully_anonymised"
+    tags: [education, sales_cloud, lead_routing, response_time, rto]
+
+  MS-03:
+    type: micro_story
+    title: "RTO enrolment pipeline recovery"
+    claimable: >
+      An Australian RTO recovered visibility over their full enrolment
+      pipeline by reconfiguring Sales Cloud to match their actual admissions
+      workflow — enquiry, application, compliance review, enrolled. Staff
+      adoption went from near-zero to daily active use within 6 weeks of
+      reconfiguration.
+    background: >
+      Original implementation was done by a generalist SI who built a
+      standard B2B sales pipeline. Admissions staff never adopted it.
+      RTO was running enrolments from Excel for 8 months post go-live.
+      Komet reconfigured — didn't rebuild — in a 4-week engagement.
+    anonymisation: "fully_anonymised"
+    tags: [education, sales_cloud, adoption, pipeline, rto]
+
+  MS-04:
+    type: micro_story
+    title: "Wisenet-Salesforce integration fix"
+    claimable: >
+      An education provider eliminated double-handling between Wisenet
+      and Salesforce by implementing a monitored sync pattern. Data
+      discrepancies dropped from a weekly occurrence to near-zero.
+      Staff stopped manually cross-referencing systems.
+    background: >
+      Provider had both Wisenet (SIS) and Salesforce (CRM) but no
+      reliable sync. Student records were created manually in both
+      systems. Compliance reporting pulled from Wisenet, pipeline
+      reporting from Salesforce — figures never matched.
+    anonymisation: "fully_anonymised"
+    tags: [education, integrations, wisenet, sync, data_quality]
+
+  MS-05:
+    type: micro_story
+    title: "Admissions team adoption turnaround"
+    claimable: >
+      An admissions team that had abandoned Salesforce post go-live
+      returned to daily active use after training was rebuilt around
+      their actual workflow — student journey stages, not sales funnel
+      stages. No system rebuild was required.
+    background: >
+      Team of 8 admissions staff across 2 campuses. Original training
+      was generic Salesforce onboarding. Staff described the system as
+      "not built for what we do." Retraining took 3 half-day sessions
+      using education-specific terminology and scenarios.
+    anonymisation: "fully_anonymised"
+    tags: [education, adoption, training, sales_cloud]
+
+  MS-07:
+    type: micro_story
+    title: "Data quality cleanup for SMB"
+    claimable: >
+      A mid-market Australian business improved Salesforce reporting
+      accuracy by implementing data ownership rules and validation
+      at point of entry. Dashboard trust went from "nobody believes
+      the numbers" to reliable monthly reporting within one quarter.
+    background: >
+      ~50 Salesforce users, Sales Cloud. No validation rules, no
+      required fields enforced. Pipeline reports showed inflated
+      figures because reps weren't updating opportunity stages.
+      CEO had stopped using Salesforce reports entirely.
+    anonymisation: "fully_anonymised"
+    tags: [cross_industry, sales_cloud, data_quality, reporting]
+
+  MS-08:
+    type: micro_story
+    title: "Lean team governance model"
+    claimable: >
+      A company with a single part-time Salesforce admin reduced their
+      change request backlog by 60% by implementing a lightweight
+      governance framework — prioritised request intake, monthly
+      release cadence, and documented change process.
+    background: >
+      Admin was fielding ad-hoc requests via Slack, email, and
+      walk-ups. No visibility on backlog size or priority. Leadership
+      assumed "Salesforce is fine" because no-one was escalating.
+      Admin was close to burnout.
+    anonymisation: "fully_anonymised"
+    tags: [cross_industry, governance, admin, operating_model]
+
+patterns:
+  P-01:
+    type: pattern
+    title: "Enquiry response time benchmark"
+    claimable: >
+      Industry data shows sub-1-hour response to education enquiries
+      significantly increases conversion likelihood compared to
+      24+ hour response windows. Speed-to-lead is a measurable
+      conversion lever in admissions, not just a vanity metric.
+    background: >
+      Based on aggregated industry research and Komet's observed
+      patterns across AU education clients. Exact figures vary by
+      provider type (RTO vs private college vs university pathway).
+    anonymisation: "not_applicable"
+    tags: [education, response_time, conversion, benchmark]
+
+  P-02:
+    type: pattern
+    title: "Salesforce implementation failure rate"
+    claimable: >
+      A significant proportion of Salesforce implementations in
+      education fail to achieve sustained user adoption within
+      12 months of go-live. The primary driver is process-fit
+      failure, not technology failure.
+    background: >
+      Komet's direct observation across Australian education sector.
+      "Failure" defined as: system technically live but primary users
+      (admissions/enrolments staff) have reverted to manual processes
+      or parallel systems for core workflows.
+    anonymisation: "not_applicable"
+    tags: [education, implementation, adoption, failure_rate]
+
+  P-03:
+    type: pattern
+    title: "Silent integration failure pattern"
+    claimable: >
+      Integration failures between CRM and SIS platforms frequently
+      go undetected for weeks or months because no monitoring or
+      alerting is configured at implementation. Data gaps only surface
+      during reporting or compliance review cycles.
+    background: >
+      Common across Salesforce-Wisenet, Salesforce-ReadyTech, and
+      custom API integrations in AU education. Most SIs don't include
+      monitoring in their implementation scope.
+    anonymisation: "not_applicable"
+    tags: [education, integrations, monitoring, silent_failure]
+
+  P-04:
+    type: pattern
+    title: "Education CRM lifecycle stages"
+    claimable: >
+      Standard Salesforce opportunity stages (Prospecting, Qualification,
+      Needs Analysis, Closed Won) do not map to education admissions
+      without significant reconfiguration. Education requires stages like
+      Enquiry, Application Received, Compliance Review, Offer Made,
+      Accepted, Enrolled, Commenced.
+    background: >
+      This is a verifiable product-level observation. Default Sales Cloud
+      setup assumes B2B sales motion. Education admissions is a distinct
+      workflow with compliance checkpoints, intake cycles, and agent/referral
+      attribution that have no B2B equivalent.
+    anonymisation: "not_applicable"
+    tags: [education, sales_cloud, pipeline, lifecycle, implementation]
+
+  P-06:
+    type: pattern
+    title: "Form-to-CRM lead leakage"
+    claimable: >
+      Lead leakage between website forms and CRM is one of the most
+      common and least visible pipeline problems in education. Causes
+      include misconfigured web-to-lead, missing field mappings, and
+      no error alerting on form submission failures.
+    background: >
+      Komet has observed this pattern in the majority of education
+      Salesforce audits. Providers often don't know leads are being
+      lost because no-one is monitoring the form-to-CRM handoff.
+    anonymisation: "not_applicable"
+    tags: [education, integrations, lead_leakage, forms, web_to_lead]
+
+  P-08:
+    type: pattern
+    title: "Dashboard trust deficit"
+    claimable: >
+      When CRM data quality is poor, leadership stops trusting
+      dashboards and reverts to manual reporting or gut-feel
+      decision making. The dashboard itself is rarely the problem —
+      data ownership and entry discipline are the root causes.
+    background: >
+      Cross-industry pattern. Particularly acute in organisations
+      where Salesforce was implemented without data governance
+      rules or where validation was relaxed to reduce friction
+      during rollout.
+    anonymisation: "not_applicable"
+    tags: [cross_industry, data_quality, reporting, dashboards]
+
+  P-09:
+    type: pattern
+    title: "Admin overload in lean teams"
+    claimable: >
+      Organisations with a single Salesforce admin and no governance
+      framework consistently experience backlog growth, unmanaged
+      technical debt, and eventual admin burnout. The admin becomes
+      a single point of failure for all platform decisions.
+    background: >
+      Common in AU SMBs with 20-100 Salesforce users. Admin is often
+      a business analyst or ops person who inherited the role, not a
+      dedicated Salesforce professional.
+    anonymisation: "not_applicable"
+    tags: [cross_industry, governance, admin, operating_model]
