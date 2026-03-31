@@ -89,6 +89,7 @@ class KometContentIntelligenceCrew:
         return Task(
             config=self.tasks_config["brand_check_task"],
             output_file="outputs/content_pack.md",
+            human_input=True,
         )
 
     @crew
