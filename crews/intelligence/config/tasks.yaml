@@ -1,0 +1,66 @@
+competitor_scan_task:
+  description: >
+    Search for recent content from AU/NZ Salesforce partners and education
+    technology consultants. Use web search to find LinkedIn posts, blog articles,
+    and thought leadership from competitors. Identify:
+    1. Topics they are covering this week
+    2. Engagement signals (likes, comments, shares where visible)
+    3. Content gaps — topics Komet could own that competitors are not covering
+    4. Messaging patterns — how competitors position themselves
+    Output a structured competitive content map in markdown.
+  expected_output: >
+    Competitive content map with competitor names, topics covered, engagement
+    signals, identified gaps, and messaging patterns. Markdown format.
+  agent: competitor_monitor
+
+trend_research_task:
+  description: >
+    Search the web for trending topics relevant to Komet's ICP. Focus areas:
+    - Salesforce in education AU/NZ
+    - Admissions operations and student lifecycle management
+    - AI in education administration
+    - Agentforce applications in education
+    - CRM data quality and integration challenges
+    For each trend, provide: topic, search evidence, relevance to Komet ICP,
+    and suggested angle for content.
+  expected_output: >
+    5-7 trending topics with search evidence, ICP relevance assessment,
+    and suggested content angles. Markdown format.
+  agent: trend_researcher
+
+performance_analysis_task:
+  description: >
+    Analyse Komet's recent content performance using GSC metrics and any
+    available LinkedIn data. Identify:
+    1. Top-performing content (by clicks, impressions, engagement)
+    2. Topics driving site visits
+    3. Underperforming content and likely reasons
+    4. Keyword opportunities (high impressions, low clicks)
+    Produce an actionable performance summary.
+  expected_output: >
+    Performance summary with top performers, underperformers, keyword
+    opportunities, and clear signals for next week's content. Markdown format.
+  agent: performance_analyst
+
+idea_generation_task:
+  description: >
+    Synthesise the competitive map, trend research, and performance analysis
+    into a ranked list of 8-10 content ideas for the coming week.
+
+    For each idea provide:
+    1. Topic and single best angle
+    2. Hook option (problem-first or counterintuitive)
+    3. Content format: LinkedIn post or blog article
+    4. Proof items to draw from (by ID from proof library)
+    5. Offer mapping (A, B, or C) with specific CTA variant
+    6. Rationale tied to ICP pain point
+    7. AGENTFORCE flag if topic involves Agentforce
+
+    Ranking criteria: expected ICP impact. Education wedge = 60% of ideas.
+    Do not duplicate topics from config/calendar/Komet content pipeline sheet.csv.
+  expected_output: >
+    Ranked list of 8-10 content ideas in markdown, each with all 7 fields
+    populated. Ready for Nick to review and approve in Slack.
+  agent: idea_generator
+  context: [competitor_scan_task, trend_research_task, performance_analysis_task]
+  output_file: "outputs/weekly_ideas.md"

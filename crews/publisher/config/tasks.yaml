@@ -1,0 +1,38 @@
+publish_task:
+  description: >
+    Publish the approved content pack: {content_pack}
+    Image/carousel asset: {creative_asset}
+    Content type: {content_type}  (linkedin_post | blog_article | both)
+
+    If content_type includes blog_article:
+      - Use WordPress Publisher tool to create a DRAFT post (not published)
+      - Title: use SEO title from content pack
+      - Body: full article content — do not truncate
+      - Excerpt/meta: meta description from content pack
+      - Tags: derive from product anchor and cluster in content pack
+      - Status: draft (WordPress tool parameter: status="draft")
+      - Return: WordPress draft URL
+
+    If content_type includes linkedin_post:
+      - If image attached: use LinkedIn Publisher image upload tool, then create post
+      - If carousel PDF attached: use LinkedIn Publisher document upload tool, then create post
+      - Post copy: final post from content pack
+      - Return: LinkedIn post URL
+
+    Final output must be a clean JSON log record:
+    {
+      "topic": "...",
+      "content_type": "...",
+      "linkedin_url": "...",
+      "wordpress_draft_url": "...",
+      "image_url": "...",
+      "qa_average": "...",
+      "offer_mapping": "...",
+      "proof_refs": "...",
+      "published_at": "ISO timestamp"
+    }
+    This JSON is sent to n8n for Google Sheets logging. Keep it small and clean.
+  expected_output: >
+    JSON log record confirming all publish actions with URLs.
+    Any failures reported as {"error": "...", "channel": "..."} in the record.
+  agent: content_publisher

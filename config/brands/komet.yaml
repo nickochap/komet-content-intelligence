@@ -1,0 +1,190 @@
+business:
+  name: Komet
+  domain: gokomet.com
+  tagline: "Salesforce outcomes for AU/NZ education providers"
+  geography: "AU/NZ primary. UK/US/Canada secondary."
+
+positioning:
+  one_liner: >
+    Komet helps AU/NZ small-mid market organisations make Salesforce deliver real
+    operational outcomes — clean data, reliable processes, and integrations that
+    hold up in the real world. Education is our strongest vertical.
+
+  pov_pillars:
+    - "Outcomes over features: Salesforce is valuable when it changes how work gets done."
+    - "Integration quality is make-or-break: third-party connections determine ecosystem output."
+    - "Lifecycle clarity before automation: define the journey before building flows."
+    - "Direct access, fewer layers: clients work directly with the people building their solution."
+    - "Adoption is engineered, not trained: fewer steps, clear prompts, guardrails."
+
+icp:
+  primary: "Education providers — RTOs, VET, ELICOS, private colleges (AU/NZ SMB/MM)"
+  secondary:
+    - "Financial services (AU/NZ SMB/MM)"
+    - "Property funds"
+    - "Auto finance"
+    - "General SMB/MM Salesforce users"
+
+  decision_makers:
+    - "CEO/GM"
+    - "Head of Admissions / Student Recruitment"
+    - "Head of Marketing / Growth"
+    - "COO / Head of Operations"
+    - "CIO/IT Manager"
+    - "Salesforce Platform Owner / Admin"
+
+  buying_triggers:
+    - "Intake targets not being met"
+    - "Lead leakage between marketing, admissions, and enrolments"
+    - "Slow or inconsistent follow-up to enquiries"
+    - "Reporting does not reconcile across systems"
+    - "Multiple systems, messy integrations, no monitoring"
+    - "Manual workflows and spreadsheet operations"
+
+voice:
+  traits:
+    - "Trusted advisor, calm confidence — no chest-beating"
+    - "Practical and pattern-based — trade-offs and failure modes"
+    - "Partner tone — tackle problems together"
+    - "SMB/MM reality-aware — lean teams, limited admin capacity"
+    - "Operator perspective — has lived through these problems"
+    - "Zero hype — assume a sceptical CEO reading this"
+
+  au_english: true
+  correct_terms:
+    enrolment: true      # not "enrollment"
+    programme: true      # in formal education contexts
+    colour: true         # not "color"
+    organisation: true   # not "organization"
+
+  banned_phrases:
+    - "game changer"
+    - "revolutionary"
+    - "10x"
+    - "synergy"
+    - "unlock"
+    - "transform"
+    - "revolutionise"
+    - "best-in-class"
+    - "unleash"
+    - "cutting-edge"
+    - "leverage"
+    - "seamlessly"
+    - "robust"
+
+  format:
+    paragraph_length: "1-3 lines maximum"
+    hook_style: "Problem-first or counterintuitive observation"
+    cta_rule: "One CTA per post. Specific. Maps to one offer."
+
+products:
+  - name: "Sales Cloud"
+    use_case: "Lead-to-enrolment pipeline, routing, activity standards, forecasting"
+    content_type: standard
+
+  - name: "Education Cloud"
+    use_case: "Student lifecycle data model, programme objects, reporting"
+    content_type: standard
+
+  - name: "Marketing Cloud"
+    use_case: "Nurture sequences, lifecycle comms, attribution"
+    content_type: standard
+
+  - name: "Agentforce"
+    use_case: "Triage, deflection, routing assist, admin reduction"
+    content_type: agentforce
+    caution: >
+      Position carefully. No hype. Useful only where it replaces defined manual steps.
+      All Agentforce content requires Caden technical review before publish.
+      Never claim AI capabilities beyond what Salesforce officially documents.
+    caden_review_required: true
+    caden_slack_channel: C0AGGM4225D
+
+  - name: "Integrations"
+    use_case: "Forms, telephony, LMS/SIS, finance, analytics — with monitoring"
+    content_type: standard
+
+offers:
+  A:
+    name: "Admissions and RevOps Diagnostic"
+    duration: "2-3 weeks"
+    ctas:
+      education_admissions: "Book a 30-minute admissions pipeline reality check — we'll map where leads are leaking."
+      education_data: "Your CRM data drives your reporting. We'll audit your data quality in 30 minutes."
+      education_integration: "If your forms, comms, or LMS integration fails quietly, you're losing enrolments. Book a 30-minute integration health check."
+      cross_industry: "Not sure where your Salesforce pipeline is leaking? Book a 30-minute RevOps reality check."
+      generic: "We run a free 30-minute diagnostic call. No pitch — just a clear picture of what's working and what isn't."
+  B:
+    name: "Salesforce Operating Model"
+    type: "Ongoing retainer"
+    ctas:
+      education: "Your Salesforce instance needs ongoing care, not just a one-off fix. Talk to us about a structured operating model."
+      governance: "If your admin is stretched and your backlog is unmanaged, you need a governance model — not another project. Let's talk."
+  C:
+    name: "Implementation / Rescue Projects"
+    ctas:
+      pipeline: "If you're using Sales Cloud but still losing leads, we'll map your lifecycle and fix routing and ownership."
+      education_cloud: "Considering Education Cloud? We'll tell you what it solves — and what you still need to design."
+      integration: "If your forms or integrations fail quietly, we'll set up monitoring and stop the leakage."
+      data: "Duplicates, missing fields, inconsistent stages — we've cleaned worse. Let's scope it."
+      agentforce: "Want to evaluate Agentforce for your admissions team? We'll map the use cases and what's actually ready."
+
+qa_rubric:
+  dimensions:
+    A: {name: "Buyer relevance", threshold: 4}
+    B: {name: "Specificity", threshold: 4}
+    C: {name: "Evidence and integrity", threshold: 4, hard_floor: true}
+    D: {name: "Practicality", threshold: 4}
+    E: {name: "Voice consistency", threshold: 4, hard_floor: true}
+    F: {name: "Education resonance", threshold: 4, required_for: "education-tagged"}
+  publish_threshold: 4.0
+
+  auto_fail:
+    - "Unsupported claim stated as fact"
+    - "Generic — could be any Salesforce partner"
+    - "Missing CTA or offer mapping"
+    - "Product named without outcome and pattern"
+    - "Banned phrase used"
+    - "Agentforce content without caden_review flag"
+    - "Agentforce capability claim not in official Salesforce documentation"
+
+proof_library:
+  sheet_id: "1S43xzHTXPWlwNGUV_R_qmZ-mPRPMS85NF5zMnxVTzF4"
+  sheet_tab: "Proof Library"
+  micro_stories: ["MS-01","MS-02","MS-03","MS-04","MS-05","MS-06","MS-07","MS-08","MS-09","MS-10","MS-11","MS-12"]
+  patterns: ["P-01","P-02","P-03","P-04","P-05","P-06","P-07","P-08","P-09","P-10"]
+  rules:
+    claimable: "Can be stated in content with client anonymised"
+    background: "Context for agents only — never appears in published content"
+    never: "Do not invent proof. If no proof, label as opinion or hypothesis."
+
+education_lifecycle:
+  stages: ["Lead", "Applicant", "Enrolled", "Active Student", "Alumni"]
+  leakage_points:
+    - {from: "Lead", to: "Applicant", failure: "No follow-up, no SLA, no routing, agent leads duplicated"}
+    - {from: "Applicant", to: "Enrolled", failure: "Document stalls, applicants ghost, no intake pipeline view"}
+    - {from: "Enrolled", to: "Active", failure: "Fragmented onboarding, LMS/SIS sync fails, no-shows"}
+    - {from: "Active", to: "Alumni", failure: "Retention risk invisible, support not triaged, completion not captured"}
+
+channels:
+  linkedin:
+    page: "Company page"
+    frequency: "3-4 posts per week"
+    mix: "60% education, 40% cross-industry"
+    formats: ["single post with image", "carousel PDF", "text-only insight"]
+  blog:
+    platform: WordPress
+    endpoint: "https://gokomet.com/wp-json/wp/v2/posts"
+    frequency: "2 per month"
+    min_words: 700
+
+visual_identity:
+  style: "B2B professional services — authoritative, not aspirational"
+  palette:
+    primary: "#0B1A2B"
+    accent: "#1D9E75"
+    background: "#F4F6F8"
+  image_direction:
+    prefer: "Process diagrams, data visualisations, professional operational contexts"
+    avoid: "Consumer lifestyle photography, aspirational student imagery"
+    text_overlay: "Bold, high contrast, max 8 words"

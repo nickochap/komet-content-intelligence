@@ -1,0 +1,22 @@
+creative_task:
+  description: >
+    Generate visual assets for the content brief: {content_brief}
+
+    1. Read the image brief from the content strategy
+    2. Generate a hero image using the Image Generator tool
+       - Follow Komet visual identity: dark navy + teal, professional B2B
+       - No consumer lifestyle photography or aspirational student imagery
+       - Aspect ratio: 4:5 for LinkedIn, 16:9 for blog hero
+    3. If carousel format specified in brief:
+       - Extract key points into slide headings and descriptions
+       - Generate carousel PDF using the Carousel Generator tool
+       - Maximum 8 slides per carousel
+    4. Return all asset URLs in structured format
+
+    Asset format:
+    IMAGE_URL: [url]
+    CAROUSEL_PDF_URL: [url if applicable]
+  expected_output: >
+    Structured asset list with URLs for all generated visuals.
+    IMAGE_URL always present. CAROUSEL_PDF_URL if carousel was requested.
+  agent: creative_director
