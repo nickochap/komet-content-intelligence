@@ -12,8 +12,6 @@ if not os.environ.get("OPENAI_API_KEY"):
 from crewai import Agent, Task, Crew, Process, LLM
 from crewai.project import CrewBase, agent, task, crew
 from komet_content_intelligence.tools.proof_library import ProofLibraryTool
-from komet_content_intelligence.tools.wordpress_publisher import WordPressPublisherTool
-from komet_content_intelligence.tools.linkedin_publisher import LinkedInPublisherTool
 
 # Configure Claude with generous max_tokens for long content packages
 claude_llm = LLM(
