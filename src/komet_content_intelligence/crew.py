@@ -40,7 +40,7 @@ class KometContentIntelligenceCrew:
             config=self.agents_config["content_strategist"],
             tools=[self.proof_tool],
             verbose=True,
-            llm="claude-sonnet-4-6",
+            llm="anthropic/claude-sonnet-4-6",
         )
 
     @agent
@@ -48,7 +48,7 @@ class KometContentIntelligenceCrew:
         return Agent(
             config=self.agents_config["content_writer"],
             verbose=True,
-            llm="claude-sonnet-4-6",
+            llm="anthropic/claude-sonnet-4-6",
         )
 
     @agent
@@ -56,7 +56,7 @@ class KometContentIntelligenceCrew:
         return Agent(
             config=self.agents_config["content_critic"],
             verbose=True,
-            llm="claude-sonnet-4-6",
+            llm="anthropic/claude-sonnet-4-6",
         )
 
     @agent
@@ -64,7 +64,7 @@ class KometContentIntelligenceCrew:
         return Agent(
             config=self.agents_config["brand_guardian"],
             verbose=True,
-            llm="claude-sonnet-4-6",
+            llm="anthropic/claude-sonnet-4-6",
         )
 
     @task
