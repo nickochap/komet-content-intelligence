@@ -12,6 +12,8 @@ if not os.environ.get("OPENAI_API_KEY"):
 from crewai import Agent, Task, Crew, Process, LLM
 from crewai.project import CrewBase, agent, task, crew
 from komet_content_intelligence.tools.proof_library import ProofLibraryTool
+from komet_content_intelligence.tools.wordpress_publisher import WordPressPublisherTool
+from komet_content_intelligence.tools.linkedin_publisher import LinkedInPublisherTool
 
 # Configure Claude with generous max_tokens for long content packages
 # Blog packages need ~3000 words across all sections = ~4000 tokens minimum
@@ -41,6 +43,8 @@ class KometContentIntelligenceCrew:
     def __init__(self, brand: str = "komet"):
         self.brand_config = load_brand_config(brand)
         self.proof_tool = ProofLibraryTool()
+        self.wp_tool = WordPressPublisherTool()
+        self.li_tool = LinkedInPublisherTool()
 
     @agent
     def content_strategist(self) -> Agent:
@@ -75,6 +79,15 @@ class KometContentIntelligenceCrew:
             llm=claude_llm,
         )
 
+    @agent
+    def content_publisher(self) -> Agent:
+        return Agent(
+            config=self.agents_config["content_publisher"],
+            tools=[self.wp_tool, self.li_tool],
+            verbose=True,
+            llm=claude_llm,
+        )
+
     @task
     def strategy_task(self) -> Task:
         return Task(config=self.tasks_config["strategy_task"])
@@ -93,6 +106,17 @@ class KometContentIntelligenceCrew:
             config=self.tasks_config["brand_check_task"],
             output_file="outputs/content_pack.md",
         )
+
+    @task
+    def nick_review_task(self) -> Task:
+        return Task(
+            config=self.tasks_config["nick_review_task"],
+            human_input=True,
+        )
+
+    @task
+    def publish_task(self) -> Task:
+        return Task(config=self.tasks_config["publish_task"])
 
     @crew
     def crew(self) -> Crew:

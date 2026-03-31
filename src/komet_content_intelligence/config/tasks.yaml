@@ -181,3 +181,60 @@ brand_check_task:
   agent: brand_guardian
   context: [critique_task]
   output_file: "outputs/content_pack.md"
+
+nick_review_task:
+  description: >
+    HUMAN-IN-THE-LOOP APPROVAL GATE.
+
+    Present the approved content package to Nick for final review.
+    Nick will either APPROVE (proceed to publish) or REJECT with notes.
+
+    If APPROVED: pass the complete content package to the Publisher agent.
+    If REJECTED: stop the pipeline. Nick's rejection notes will be logged.
+
+    Do not modify the content. Do not add commentary. Simply present the
+    package as-is and wait for Nick's decision.
+  expected_output: >
+    Nick's decision: APPROVED (content package passed through unchanged)
+    or REJECTED (with Nick's notes captured).
+  agent: brand_guardian
+  human_input: true
+  context: [brand_check_task]
+
+publish_task:
+  description: >
+    Publish the approved content package to the correct channels.
+
+    Determine content type from the package:
+    - If package contains ARTICLE section: this is a blog article
+    - If package contains FINAL POST section without ARTICLE: this is a LinkedIn post
+    - If package contains both: publish both
+
+    For BLOG ARTICLE:
+      - Use WordPress Publisher tool to create a DRAFT post (never live)
+      - Title: use SEO TITLE from the package
+      - Body: full ARTICLE content — do not truncate a single word
+      - Excerpt: META DESCRIPTION from the package
+      - Status: draft (always draft — Nick does final visual review in WordPress)
+      - Return: WordPress draft URL
+
+    For LINKEDIN POST:
+      - Use LinkedIn Publisher tool to create the post
+      - Post copy: FINAL POST section from the package
+      - Return: LinkedIn post URL
+
+    Final output must be a JSON log record:
+    {{
+      "topic": "extracted from package",
+      "content_type": "linkedin_post | blog_article | both",
+      "linkedin_url": "URL or null",
+      "wordpress_draft_url": "URL or null",
+      "published_at": "ISO timestamp",
+      "status": "published | draft_created | error",
+      "errors": []
+    }}
+  expected_output: >
+    JSON log record confirming all publish actions with URLs.
+    Any failures reported with channel and error detail.
+  agent: content_publisher
+  context: [nick_review_task]
