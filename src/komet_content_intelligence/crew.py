@@ -16,11 +16,11 @@ from komet_content_intelligence.tools.wordpress_publisher import WordPressPublis
 from komet_content_intelligence.tools.linkedin_publisher import LinkedInPublisherTool
 
 # Configure Claude with generous max_tokens for long content packages
-# Blog packages need ~3000 words across all sections = ~4000 tokens minimum
-# Setting 16384 to ensure full blog packages never truncate
+# Blog articles alone need 1500-2500 words (~2000-3500 tokens) plus all
+# other sections. 32768 ensures nothing truncates.
 claude_llm = LLM(
     model="anthropic/claude-sonnet-4-6",
-    max_tokens=16384,
+    max_tokens=32768,
 )
 
 
