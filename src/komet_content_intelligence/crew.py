@@ -1,11 +1,17 @@
+import os
 import yaml
 from pathlib import Path
-from crewai import Agent, Task, Crew, Process
-from crewai.project import CrewBase, agent, task, crew
 from dotenv import load_dotenv
-from komet_content_intelligence.tools.proof_library import ProofLibraryTool
 
 load_dotenv()
+
+# CrewAI requires OPENAI_API_KEY at import time even when using Claude
+if not os.environ.get("OPENAI_API_KEY"):
+    os.environ["OPENAI_API_KEY"] = "not-used"
+
+from crewai import Agent, Task, Crew, Process
+from crewai.project import CrewBase, agent, task, crew
+from komet_content_intelligence.tools.proof_library import ProofLibraryTool
 
 
 def load_brand_config(brand: str = "komet") -> dict:
