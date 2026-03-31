@@ -1,0 +1,25 @@
+[project]
+name = "komet-content-intelligence"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "crewai>=1.12.2",
+    "crewai-tools>=1.12.2",
+    "google-auth>=2.49.1",
+    "gspread>=6.2.1",
+    "mcp-crew-ai",
+    "python-dotenv>=1.1.1",
+    "pyyaml>=6.0.3",
+    "requests>=2.32.5",
+    "slack-sdk>=3.41.0",
+]
+
+[tool.uv]
+override-dependencies = [
+    "lancedb>=0.1; sys_platform != 'win32'",
+]
+
+[tool.uv.sources]
+mcp-crew-ai = { git = "https://github.com/adam-paterson/mcp-crew-ai.git" }

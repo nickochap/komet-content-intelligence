@@ -1,0 +1,8 @@
+{
+  "mcpServers": {
+    "mcp-crew-ai": {
+      "command": "uvx",
+      "args": ["mcp-crew-ai"]
+    }
+  }
+}

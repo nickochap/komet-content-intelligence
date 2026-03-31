@@ -1,0 +1,21 @@
+# Python-generated files
+__pycache__/
+*.py[oc]
+build/
+dist/
+wheels/
+*.egg-info
+
+# Virtual environments
+.venv/
+
+# Secrets
+.env
+
+# Outputs and reference
+outputs/
+_reference/
+
+# Misc
+*.pkl
+config/google_credentials.json
