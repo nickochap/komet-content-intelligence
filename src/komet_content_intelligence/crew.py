@@ -14,9 +14,11 @@ from crewai.project import CrewBase, agent, task, crew
 from komet_content_intelligence.tools.proof_library import ProofLibraryTool
 
 # Configure Claude with generous max_tokens for long content packages
+# Blog packages need ~3000 words across all sections = ~4000 tokens minimum
+# Setting 16384 to ensure full blog packages never truncate
 claude_llm = LLM(
     model="anthropic/claude-sonnet-4-6",
-    max_tokens=8192,
+    max_tokens=16384,
 )
 
 
