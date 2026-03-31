@@ -9,9 +9,15 @@ load_dotenv()
 if not os.environ.get("OPENAI_API_KEY"):
     os.environ["OPENAI_API_KEY"] = "not-used"
 
-from crewai import Agent, Task, Crew, Process
+from crewai import Agent, Task, Crew, Process, LLM
 from crewai.project import CrewBase, agent, task, crew
 from komet_content_intelligence.tools.proof_library import ProofLibraryTool
+
+# Configure Claude with generous max_tokens for long content packages
+claude_llm = LLM(
+    model="anthropic/claude-sonnet-4-6",
+    max_tokens=8192,
+)
 
 
 def load_brand_config(brand: str = "komet") -> dict:
@@ -40,7 +46,7 @@ class KometContentIntelligenceCrew:
             config=self.agents_config["content_strategist"],
             tools=[self.proof_tool],
             verbose=True,
-            llm="anthropic/claude-sonnet-4-6",
+            llm=claude_llm,
         )
 
     @agent
@@ -48,7 +54,7 @@ class KometContentIntelligenceCrew:
         return Agent(
             config=self.agents_config["content_writer"],
             verbose=True,
-            llm="anthropic/claude-sonnet-4-6",
+            llm=claude_llm,
         )
 
     @agent
@@ -56,7 +62,7 @@ class KometContentIntelligenceCrew:
         return Agent(
             config=self.agents_config["content_critic"],
             verbose=True,
-            llm="anthropic/claude-sonnet-4-6",
+            llm=claude_llm,
         )
 
     @agent
@@ -64,7 +70,7 @@ class KometContentIntelligenceCrew:
         return Agent(
             config=self.agents_config["brand_guardian"],
             verbose=True,
-            llm="anthropic/claude-sonnet-4-6",
+            llm=claude_llm,
         )
 
     @task

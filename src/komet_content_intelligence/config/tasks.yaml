@@ -28,8 +28,11 @@ writing_task:
     If strategy brief contains AGENTFORCE_TOPIC=true, include AGENTFORCE_CONTENT
     flag at the top. Tie every Agentforce claim to a documented Salesforce feature.
 
+    IMPORTANT: The strategy brief specifies the content format (LinkedIn post OR
+    blog article). Produce ONLY the matching package below. Never produce both.
+
     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-    LINKEDIN PACKAGE — ALL FIELDS MANDATORY
+    LINKEDIN PACKAGE — ALL FIELDS MANDATORY (if format = LinkedIn post)
     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
     ## FINAL POST
     [publishable post — hook + body + CTA, 800-1300 characters, AU English]
@@ -63,7 +66,7 @@ writing_task:
     [list proof item IDs referenced and how each was used — claimable or context only]
 
     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-    BLOG PACKAGE — ALL FIELDS MANDATORY
+    BLOG PACKAGE — ALL FIELDS MANDATORY (if format = blog article)
     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
     ## ARTICLE
     [full article — minimum 700 words, structured per template in content_templates.md]
@@ -106,7 +109,9 @@ writing_task:
 critique_task:
   description: >
     STEP 1 — PACKAGE COMPLETENESS CHECK (before quality scoring).
-    Verify every required section is present and populated:
+    Determine which format was requested (LinkedIn post or blog article) from
+    the strategy brief, then verify every required section for THAT format
+    is present and populated:
 
     LinkedIn must have: FINAL POST, ALTERNATE HOOK 1, ALTERNATE HOOK 2,
     ALTERNATE CTA, FOLLOW-UP COMMENT 1, FOLLOW-UP COMMENT 2, FOLLOW-UP COMMENT 3,
@@ -115,6 +120,9 @@ critique_task:
     Blog must have: ARTICLE (700+ words), SEO TITLE, META DESCRIPTION,
     LINKEDIN DERIVATIVE POST, REPURPOSED SNIPPET 1, REPURPOSED SNIPPET 2,
     REPURPOSED SNIPPET 3, IMAGE BRIEF, PROOF USED.
+
+    Only check sections for the format that was requested. Do not fail because
+    blog sections are missing when the format is LinkedIn, or vice versa.
 
     If any section is missing or empty: FAIL immediately with
     "INCOMPLETE PACKAGE — missing: [list of missing sections]".
