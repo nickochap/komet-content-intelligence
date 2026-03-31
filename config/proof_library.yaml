@@ -1,218 +1,367 @@
-# Komet Proof Library
-# Each item has: id, type, claimable (can be quoted/cited in published content),
-# background (informs tone/angle but cannot be directly cited),
-# anonymisation level, and tags for matching to topics.
-#
-# Claimable = safe to reference directly in published posts
-# Background = use to inform angle/framing only, never quote or cite
-#
-# To add new items: append to the relevant section below.
-# To sync from Google Sheets: run scripts/sync_proof_library.py (future)
+# Komet Proof Library — synced from Google Sheets
+# Each item has claimable (can be quoted/cited) and background (informs angle only)
+# Anonymisation rules MUST be followed in all published content
 
 micro_stories:
   MS-01:
     type: micro_story
-    title: "Lead routing fix for AU private college"
+    title: "Email-to-Case threading fix for ELICOS provider"
+    client_code: "CLIENT-ELICOS-A"
+    problem: >
+      Email-to-Case was regularly threading inbound replies to the wrong Case,
+      resulting in the wrong agent being assigned and losing context. This slowed
+      response times and created customer frustration.
+    approach: >
+      Implemented a deterministic case reference token (#123456#) embedded into
+      outbound email subject/body. Built an EmailMessage handler to regex-scan
+      inbound emails, extract the token, and reattach the conversation to the
+      correct Case. Tightened assignment rules, validation, and added
+      milestone-based SLA tracking.
     claimable: >
-      An Australian private college reduced enquiry response time from
-      48+ hours to under 2 hours by implementing automated lead routing
-      and ownership rules in Sales Cloud. Admissions team stopped losing
-      leads between web form and first contact.
-    background: >
-      College had 3 campuses, ~2000 enrolments/year. Previously used shared
-      inbox for all enquiries. No attribution, no SLA tracking. Salesforce
-      was installed but admissions team reverted to spreadsheets within
-      60 days of go-live because pipeline stages didn't match their process.
-    anonymisation: "fully_anonymised"
-    tags: [education, sales_cloud, lead_routing, response_time, rto]
+      45% reduction in case mismatches. Fewer manual reassignment touches.
+      Improved first-response consistency. Reporting accuracy improved.
+      Maintained 5/5 CSAT.
+    anonymisation: "Remove client name; keep 'small service team'."
+    date: "2025"
+    tags: [education, elicos, email_to_case, sla, service_cloud]
+
+  MS-02:
+    type: micro_story
+    title: "Salesforce storage cost avoidance"
+    client_code: "CLIENT-ELICOS-A"
+    problem: >
+      Salesforce storage growth (historical records and attachments) was trending
+      toward paid storage overages, creating forecasted platform cost escalation.
+    approach: >
+      Implemented a data retention and archiving approach: compressed historical
+      datasets, separated active vs archive records, and introduced an archiving
+      routine with clear retrieval rules for ops and audit needs.
+    claimable: >
+      Avoided storage overage charges (cost avoidance). Improved org performance.
+      Cleaner separation of active vs historic data.
+    anonymisation: "Do not publish cost numbers; describe as 'avoided paid storage overages'."
+    date: "2025"
+    tags: [education, elicos, storage, data_retention, cost_avoidance]
 
   MS-03:
     type: micro_story
-    title: "RTO enrolment pipeline recovery"
+    title: "Postgraduate programme digital enrolment"
+    client_code: "CLIENT-PRIVATE-COLLEGE-A"
+    problem: >
+      Postgraduate programme enrolments were processed via manual PDF forms,
+      creating slow turnaround, inconsistent eligibility assessment, and heavy
+      admin load.
+    approach: >
+      Built a branded, logic-heavy online enrolment experience in Visualforce
+      integrated with a headless WordPress front end. Implemented eligibility
+      rules (funding, scholarships, LLN) and automated record creation
+      (Contact, Opportunity, Application).
     claimable: >
-      An Australian RTO recovered visibility over their full enrolment
-      pipeline by reconfiguring Sales Cloud to match their actual admissions
-      workflow — enquiry, application, compliance review, enrolled. Staff
-      adoption went from near-zero to daily active use within 6 weeks of
-      reconfiguration.
-    background: >
-      Original implementation was done by a generalist SI who built a
-      standard B2B sales pipeline. Admissions staff never adopted it.
-      RTO was running enrolments from Excel for 8 months post go-live.
-      Komet reconfigured — didn't rebuild — in a 4-week engagement.
-    anonymisation: "fully_anonymised"
-    tags: [education, sales_cloud, adoption, pipeline, rto]
+      Replaced manual PDFs with an end-to-end digital enrolment workflow.
+      Improved consistency of eligibility assessment. Reduced administrative
+      handling and rework. Maintained 5/5 CSAT.
+    anonymisation: "Reference as 'postgraduate programme enrolment' not specific degree name."
+    date: "2024"
+    tags: [education, private_college, enrolment, visualforce, eligibility]
 
   MS-04:
     type: micro_story
-    title: "Wisenet-Salesforce integration fix"
+    title: "Salesforce-Canvas-Wisenet integration"
+    client_code: "CLIENT-PRIVATE-COLLEGE-A"
+    problem: >
+      Student onboarding required manual re-entry into LMS and SMS, and staff
+      had no unified view of progression and grades inside Salesforce.
+    approach: >
+      Designed bi-directional real-time integrations between Salesforce, Canvas
+      LMS, and Wisenet SMS. Automated user creation and course enrolments, synced
+      enrolment data and surfaced grades and progression back into Salesforce.
+      Included error handling and reconciliation.
     claimable: >
-      An education provider eliminated double-handling between Wisenet
-      and Salesforce by implementing a monitored sync pattern. Data
-      discrepancies dropped from a weekly occurrence to near-zero.
-      Staff stopped manually cross-referencing systems.
-    background: >
-      Provider had both Wisenet (SIS) and Salesforce (CRM) but no
-      reliable sync. Student records were created manually in both
-      systems. Compliance reporting pulled from Wisenet, pipeline
-      reporting from Salesforce — figures never matched.
-    anonymisation: "fully_anonymised"
-    tags: [education, integrations, wisenet, sync, data_quality]
+      Eliminated double-entry. Reduced admin overhead significantly. Staff can
+      view progression and grades without leaving Salesforce. Maintained 5/5 CSAT.
+    anonymisation: "Keep system-focused; avoid student counts and specific programme identifiers."
+    date: "2024"
+    tags: [education, private_college, integrations, canvas, wisenet, lms]
 
   MS-05:
     type: micro_story
-    title: "Admissions team adoption turnaround"
+    title: "End-to-end commercial enrolment system"
+    client_code: "CLIENT-PROFESSIONAL-BODY-A"
+    problem: >
+      Needed a complete commercial enrolment system that accepted payments,
+      provisioned learning access, and provided stakeholder reporting without
+      heavy manual operations.
+    approach: >
+      Built an end-to-end application to Stripe payment to enrolment to Canvas
+      provisioning flow, plus Experience Cloud reporting for stakeholders.
+      Delivered as a white-label programme managed by an education partner.
     claimable: >
-      An admissions team that had abandoned Salesforce post go-live
-      returned to daily active use after training was rebuilt around
-      their actual workflow — student journey stages, not sales funnel
-      stages. No system rebuild was required.
-    background: >
-      Team of 8 admissions staff across 2 campuses. Original training
-      was generic Salesforce onboarding. Staff described the system as
-      "not built for what we do." Retraining took 3 half-day sessions
-      using education-specific terminology and scenarios.
-    anonymisation: "fully_anonymised"
-    tags: [education, adoption, training, sales_cloud]
+      Unified application, payment, enrolment, and learning provisioning into
+      one controlled workflow. Reduced manual handoffs. Improved reporting
+      transparency for programme owners.
+    anonymisation: "Reference as 'professional body education programme'. Avoid naming the programme."
+    date: "2024"
+    tags: [education, professional_body, stripe, payments, canvas, experience_cloud]
+
+  MS-06:
+    type: micro_story
+    title: "Stakeholder self-service portals"
+    client_code: "CLIENT-MULTI-ORG"
+    problem: >
+      External stakeholders needed secure self-service access to programme
+      activity and reporting across many organisations, without sharing internal
+      Salesforce access.
+    approach: >
+      Built Experience Cloud portals with role-based access, tailored dashboards,
+      and operational reporting. Implemented governance for what could be seen or
+      changed and streamlined stakeholder reporting workflows.
+    claimable: >
+      Reduced ad-hoc reporting requests. Enabled stakeholder self-service access
+      to programme insights. Improved transparency through controlled reporting access.
+    anonymisation: "Reference as 'multi-organisation stakeholder network'. Do not name stakeholders."
+    date: "2024"
+    tags: [education, experience_cloud, portals, reporting, stakeholders]
 
   MS-07:
     type: micro_story
-    title: "Data quality cleanup for SMB"
+    title: "Inherited Salesforce stabilisation"
+    client_code: "CLIENT-COMMERCIAL-A"
+    problem: >
+      Inherited an underperforming Salesforce implementation from another partner:
+      unclear ownership, inconsistent data, and low user confidence.
+    approach: >
+      Ran a stabilisation sprint: audit of data model, security, automations, and
+      integrations. Implemented a decision log and change control. Refactored
+      high-risk flows. Introduced UAT gates and release cadence.
     claimable: >
-      A mid-market Australian business improved Salesforce reporting
-      accuracy by implementing data ownership rules and validation
-      at point of entry. Dashboard trust went from "nobody believes
-      the numbers" to reliable monthly reporting within one quarter.
-    background: >
-      ~50 Salesforce users, Sales Cloud. No validation rules, no
-      required fields enforced. Pipeline reports showed inflated
-      figures because reps weren't updating opportunity stages.
-      CEO had stopped using Salesforce reports entirely.
-    anonymisation: "fully_anonymised"
-    tags: [cross_industry, sales_cloud, data_quality, reporting]
+      Restored operational reliability. Improved user adoption via fewer broken
+      processes. Reduced ongoing support burden. Created a maintainable baseline
+      for future enhancements.
+    anonymisation: "Keep client anonymous; avoid naming the previous partner."
+    date: "2025"
+    tags: [cross_industry, stabilisation, audit, adoption, governance]
 
   MS-08:
     type: micro_story
-    title: "Lean team governance model"
+    title: "Licence optimisation and access governance"
+    client_code: "CLIENT-COMMERCIAL-B"
+    problem: >
+      Licence allocation didn't match real usage; over-provisioning increased
+      costs and complicated access control.
+    approach: >
+      Reviewed user roles, permissions, and actual usage patterns. Re-mapped
+      profiles and permission sets to job functions. Implemented governance for
+      new user provisioning and periodic access reviews.
     claimable: >
-      A company with a single part-time Salesforce admin reduced their
-      change request backlog by 60% by implementing a lightweight
-      governance framework — prioritised request intake, monthly
-      release cadence, and documented change process.
-    background: >
-      Admin was fielding ad-hoc requests via Slack, email, and
-      walk-ups. No visibility on backlog size or priority. Leadership
-      assumed "Salesforce is fine" because no-one was escalating.
-      Admin was close to burnout.
-    anonymisation: "fully_anonymised"
-    tags: [cross_industry, governance, admin, operating_model]
+      Reduced licence waste (cost avoidance). Simplified access management.
+      Improved security posture by aligning privileges to role needs.
+    anonymisation: "Avoid dollar amounts; describe as 'reduced licence waste'."
+    date: "2025"
+    tags: [cross_industry, licences, governance, security, cost_avoidance]
+
+  MS-09:
+    type: micro_story
+    title: "Property fund performance monitoring"
+    client_code: "CLIENT-PROPERTY-A"
+    problem: >
+      Needed a single source of truth for property fund performance monitoring
+      and client relationship management with consistent reporting and workflows.
+    approach: >
+      Designed and implemented a Salesforce-based client management and fund
+      performance monitoring solution, including structured data capture,
+      reporting architecture, and operational workflows for client interactions.
+    claimable: >
+      Improved visibility of fund performance and client activity in one system.
+      Reduced spreadsheet dependency. Enabled consistent reporting and client
+      servicing workflows.
+    anonymisation: "If sensitive, refer to 'property advisory firm'."
+    date: "2024"
+    tags: [property, fund_management, reporting, sales_cloud]
+
+  MS-10:
+    type: micro_story
+    title: "Mortgage broker portal and calculators"
+    client_code: "CLIENT-FINANCE-A"
+    problem: >
+      Mortgage broker required a customer and stakeholder portal plus web-led
+      tooling to support borrower journeys and reduce manual enquiry handling.
+    approach: >
+      Built an Experience Cloud portal with custom LWC and web integrations,
+      including loan calculators and borrowing capacity tooling captured into
+      Salesforce records for follow-up and reporting.
+    claimable: >
+      Improved digital self-service. Reduced manual back-and-forth for common
+      calculations. Increased data capture consistency for broker workflows.
+    anonymisation: "Avoid naming financial products; keep as 'broker portal and calculators'."
+    date: "2024"
+    tags: [finance, experience_cloud, lwc, portal, calculators]
 
 patterns:
   P-01:
     type: pattern
-    title: "Enquiry response time benchmark"
+    title: "Email-to-Case token matching"
+    problem: >
+      Email threads breaking and inbound replies attaching to the wrong Case,
+      causing misrouting and lost context.
+    approach: >
+      Embed a token (e.g. #123456#) into outbound email subject/body. On inbound,
+      scan with regex, extract token, match to Case, attach EmailMessage. Combine
+      with assignment rules and milestones.
     claimable: >
-      Industry data shows sub-1-hour response to education enquiries
-      significantly increases conversion likelihood compared to
-      24+ hour response windows. Speed-to-lead is a measurable
-      conversion lever in admissions, not just a vanity metric.
-    background: >
-      Based on aggregated industry research and Komet's observed
-      patterns across AU education clients. Exact figures vary by
-      provider type (RTO vs private college vs university pathway).
-    anonymisation: "not_applicable"
-    tags: [education, response_time, conversion, benchmark]
+      Prevents case misrouting. 45% reduction in case mismatches at ELICOS client.
+      Reusable for any email-heavy service environment.
+    anonymisation: "Pattern publishable without client reference."
+    date: "2025"
+    tags: [service_cloud, email_to_case, automation, pattern]
 
   P-02:
     type: pattern
-    title: "Salesforce implementation failure rate"
+    title: "SLA milestone and escalation framework"
+    problem: >
+      Inconsistent service responsiveness and no reliable way to measure or act
+      on SLA breaches.
+    approach: >
+      Define SLA milestones tied to Case types and priority using entitlements.
+      Add escalation rules and queues. Build daily operational dashboards to
+      manage breaches proactively.
     claimable: >
-      A significant proportion of Salesforce implementations in
-      education fail to achieve sustained user adoption within
-      12 months of go-live. The primary driver is process-fit
-      failure, not technology failure.
-    background: >
-      Komet's direct observation across Australian education sector.
-      "Failure" defined as: system technically live but primary users
-      (admissions/enrolments staff) have reverted to manual processes
-      or parallel systems for core workflows.
-    anonymisation: "not_applicable"
-    tags: [education, implementation, adoption, failure_rate]
+      Consistent SLA measurement and escalation. Removes reliance on spreadsheet
+      tracking.
+    anonymisation: "Pattern publishable without client reference."
+    date: "2025"
+    tags: [service_cloud, sla, entitlements, escalation, pattern]
 
   P-03:
     type: pattern
-    title: "Silent integration failure pattern"
+    title: "Data retention and storage archiving"
+    problem: >
+      Platform cost escalation and performance drag from ever-growing historical
+      data and attachments.
+    approach: >
+      Separate active vs archive data. Define retention rules. Compress and
+      archive historical datasets. Automate archiving runs with monitoring and
+      retrieval policy.
     claimable: >
-      Integration failures between CRM and SIS platforms frequently
-      go undetected for weeks or months because no monitoring or
-      alerting is configured at implementation. Data gaps only surface
-      during reporting or compliance review cycles.
-    background: >
-      Common across Salesforce-Wisenet, Salesforce-ReadyTech, and
-      custom API integrations in AU education. Most SIs don't include
-      monitoring in their implementation scope.
-    anonymisation: "not_applicable"
-    tags: [education, integrations, monitoring, silent_failure]
+      Avoids paid storage overages. Improves org performance. Deployed at
+      ELICOS client.
+    anonymisation: "Do not publish cost numbers; describe as 'avoided paid storage overages'."
+    date: "2025"
+    tags: [platform, storage, archiving, data_retention, pattern]
 
   P-04:
     type: pattern
-    title: "Education CRM lifecycle stages"
+    title: "Enrolment eligibility rules engine"
+    problem: >
+      Manual eligibility assessment leading to inconsistency, slow turnaround,
+      and compliance risk in enrolments.
+    approach: >
+      Capture application inputs online. Validate in real time. Apply rule sets
+      (funding, scholarships, LLN thresholds). Store decisions with audit trail.
+      Route exceptions through approvals.
     claimable: >
-      Standard Salesforce opportunity stages (Prospecting, Qualification,
-      Needs Analysis, Closed Won) do not map to education admissions
-      without significant reconfiguration. Education requires stages like
-      Enquiry, Application Received, Compliance Review, Offer Made,
-      Accepted, Enrolled, Commenced.
-    background: >
-      This is a verifiable product-level observation. Default Sales Cloud
-      setup assumes B2B sales motion. Education admissions is a distinct
-      workflow with compliance checkpoints, intake cycles, and agent/referral
-      attribution that have no B2B equivalent.
-    anonymisation: "not_applicable"
-    tags: [education, sales_cloud, pipeline, lifecycle, implementation]
+      Consistent eligibility decisions. Audit trail for compliance. Reduced admin
+      handling. Deployed at private college.
+    anonymisation: "Reference as 'enrolment eligibility rules engine'."
+    date: "2024"
+    tags: [education, enrolment, eligibility, compliance, pattern]
+
+  P-05:
+    type: pattern
+    title: "Payment-to-provisioning automation"
+    problem: >
+      Broken handoffs between payment completion and enrolment provisioning
+      causing manual follow-up and errors.
+    approach: >
+      Use Stripe webhooks to confirm payment state and reconcile amounts. Trigger
+      provisioning on confirmation. Include exception handling for failed or
+      partial payments, chargebacks, and retries. Log each step for audit.
+    claimable: >
+      End-to-end payment to provisioning without manual intervention. Deployed
+      at professional body education programme.
+    anonymisation: "Pattern publishable without client reference."
+    date: "2024"
+    tags: [education, stripe, payments, provisioning, pattern]
 
   P-06:
     type: pattern
-    title: "Form-to-CRM lead leakage"
+    title: "CRM-LMS-SMS integration pattern"
+    problem: >
+      Double-entry and fragmented visibility across Salesforce, LMS (Canvas),
+      and SMS (Wisenet).
+    approach: >
+      Define system-of-record per field and object. Implement API sync with
+      idempotency, retries, reconciliation, and error alerting. Push enrolments
+      and provisioning outbound. Pull grades and progression inbound.
     claimable: >
-      Lead leakage between website forms and CRM is one of the most
-      common and least visible pipeline problems in education. Causes
-      include misconfigured web-to-lead, missing field mappings, and
-      no error alerting on form submission failures.
-    background: >
-      Komet has observed this pattern in the majority of education
-      Salesforce audits. Providers often don't know leads are being
-      lost because no-one is monitoring the form-to-CRM handoff.
-    anonymisation: "not_applicable"
-    tags: [education, integrations, lead_leakage, forms, web_to_lead]
+      Eliminated double-entry. Staff view LMS progression inside Salesforce.
+      Deployed at private college (Canvas + Wisenet).
+    anonymisation: "Keep system-focused. Can name Canvas and Wisenet as systems."
+    date: "2024"
+    tags: [education, integrations, canvas, wisenet, api_sync, pattern]
+
+  P-07:
+    type: pattern
+    title: "Stakeholder portal and self-service reporting"
+    problem: >
+      External stakeholders needing secure access to reporting without internal
+      Salesforce licences or manual reporting cycles.
+    approach: >
+      Design role-based access and partner account model. Build targeted
+      dashboards and reports tailored to stakeholder jobs-to-be-done. Provide
+      self-service exports and scheduled reporting. Govern visibility tightly.
+    claimable: >
+      Reduced ad-hoc reporting requests. Enabled stakeholder self-service.
+      Deployed for multi-org programme networks and finance broker.
+    anonymisation: "Avoid stakeholder names. Pattern publishable."
+    date: "2024"
+    tags: [experience_cloud, portals, reporting, stakeholders, pattern]
 
   P-08:
     type: pattern
-    title: "Dashboard trust deficit"
+    title: "Data quality and dashboard trust"
+    problem: >
+      Leadership can't trust reporting numbers due to inconsistent stage
+      definitions and fractured data across systems.
+    approach: >
+      Standardise stage definitions, required fields, and ownership first. Build
+      governed metrics and dashboards. Establish review cadence and data quality
+      checks. Dashboards are the last step, not the first.
     claimable: >
-      When CRM data quality is poor, leadership stops trusting
-      dashboards and reverts to manual reporting or gut-feel
-      decision making. The dashboard itself is rarely the problem —
-      data ownership and entry discipline are the root causes.
-    background: >
-      Cross-industry pattern. Particularly acute in organisations
-      where Salesforce was implemented without data governance
-      rules or where validation was relaxed to reduce friction
-      during rollout.
-    anonymisation: "not_applicable"
-    tags: [cross_industry, data_quality, reporting, dashboards]
+      Removes reporting arguments between teams. Enables confident forecasting.
+      Deployed in education, programme operations, and property fund contexts.
+    anonymisation: "Pattern publishable without client reference."
+    date: "2024"
+    tags: [cross_industry, data_quality, reporting, dashboards, pattern]
 
   P-09:
     type: pattern
-    title: "Admin overload in lean teams"
+    title: "Inherited org stabilisation playbook"
+    problem: >
+      Inherited Salesforce orgs with broken automation, unclear architecture,
+      and low user adoption from a previous implementation.
+    approach: >
+      Rapid audit covering data model, security, automation, and integrations.
+      Triage high-risk failures first. Introduce decision log and change control.
+      Set UAT gates. Iterate improvements with bounded scope.
     claimable: >
-      Organisations with a single Salesforce admin and no governance
-      framework consistently experience backlog growth, unmanaged
-      technical debt, and eventual admin burnout. The admin becomes
-      a single point of failure for all platform decisions.
-    background: >
-      Common in AU SMBs with 20-100 Salesforce users. Admin is often
-      a business analyst or ops person who inherited the role, not a
-      dedicated Salesforce professional.
-    anonymisation: "not_applicable"
-    tags: [cross_industry, governance, admin, operating_model]
+      Restored operational reliability. Improved adoption. Deployed for multiple
+      commercial clients inheriting broken implementations.
+    anonymisation: "Fully anonymisable. Avoid naming previous partners."
+    date: "2025"
+    tags: [cross_industry, stabilisation, audit, adoption, governance, pattern]
+
+  P-10:
+    type: pattern
+    title: "Guided web tools with CRM data capture"
+    problem: >
+      Customers need guided tools (calculators, estimators, application forms)
+      with data captured for follow-up in CRM.
+    approach: >
+      Build LWC or embedded web tools. Validate inputs. Store structured data in
+      Salesforce. Trigger follow-up workflows and surface results in portal and CRM.
+    claimable: >
+      Captures data that would otherwise be lost. Triggers follow-up automatically.
+      Deployed at finance broker and applicable to education applications.
+    anonymisation: "Pattern publishable. Avoid naming financial products."
+    date: "2024"
+    tags: [cross_industry, lwc, calculators, lead_capture, portal, pattern]

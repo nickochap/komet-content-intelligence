@@ -39,16 +39,20 @@ class ProofLibraryTool(BaseTool):
         for pid in requested_ids:
             item = lookup.get(pid)
             if item:
-                results.append(
-                    f"ID: {pid}\n"
-                    f"Type: {item.get('type', '')}\n"
-                    f"Title: {item.get('title', '')}\n"
-                    f"CLAIMABLE: {item.get('claimable', '').strip()}\n"
-                    f"BACKGROUND ONLY: {item.get('background', '').strip()}\n"
-                    f"Anonymisation: {item.get('anonymisation', '')}\n"
-                    f"Tags: {', '.join(item.get('tags', []))}\n"
-                    "---"
-                )
+                parts = [
+                    f"ID: {pid}",
+                    f"Type: {item.get('type', '')}",
+                    f"Title: {item.get('title', '')}",
+                ]
+                if item.get('problem'):
+                    parts.append(f"PROBLEM: {item['problem'].strip()}")
+                if item.get('approach'):
+                    parts.append(f"APPROACH: {item['approach'].strip()}")
+                parts.append(f"CLAIMABLE: {item.get('claimable', '').strip()}")
+                parts.append(f"ANONYMISATION RULES: {item.get('anonymisation', '')}")
+                parts.append(f"Tags: {', '.join(item.get('tags', []))}")
+                parts.append("---")
+                results.append("\n".join(parts))
             else:
                 results.append(f"ID: {pid} — NOT FOUND in proof library\n---")
 
