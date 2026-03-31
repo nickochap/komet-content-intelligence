@@ -16,6 +16,15 @@ dependencies = [
     "slack-sdk>=3.41.0",
 ]
 
+[project.scripts]
+komet_content_intelligence = "komet_content_intelligence.main:run"
+train = "komet_content_intelligence.main:train"
+run_crew = "komet_content_intelligence.main:run"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
 [tool.uv]
 override-dependencies = [
     "lancedb>=0.1; sys_platform != 'win32'",
