@@ -101,4 +101,5 @@ class KometContentIntelligenceCrew:
             tasks=self.tasks,
             process=Process.sequential,
             verbose=True,
+            memory=True,  # enables short-term, long-term, and entity memory
         )
