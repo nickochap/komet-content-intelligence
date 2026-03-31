@@ -36,7 +36,7 @@ def load_brand_config(brand: str = "komet") -> dict:
 
 @CrewBase
 class KometContentIntelligenceCrew:
-    """Komet Content Production Crew"""
+    """Komet Content Production Crew — generates and QA-checks content packages"""
     agents_config = "config/agents.yaml"
     tasks_config = "config/tasks.yaml"
 
@@ -104,19 +104,8 @@ class KometContentIntelligenceCrew:
     def brand_check_task(self) -> Task:
         return Task(
             config=self.tasks_config["brand_check_task"],
-            output_file="outputs/content_pack.md",
-        )
-
-    @task
-    def nick_review_task(self) -> Task:
-        return Task(
-            config=self.tasks_config["nick_review_task"],
             human_input=True,
         )
-
-    @task
-    def publish_task(self) -> Task:
-        return Task(config=self.tasks_config["publish_task"])
 
     @crew
     def crew(self) -> Crew:
@@ -125,5 +114,5 @@ class KometContentIntelligenceCrew:
             tasks=self.tasks,
             process=Process.sequential,
             verbose=True,
-            memory=True,  # enables short-term, long-term, and entity memory
+            memory=True,
         )
