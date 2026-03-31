@@ -12,6 +12,8 @@ if not os.environ.get("OPENAI_API_KEY"):
 from crewai import Agent, Task, Crew, Process, LLM
 from crewai.project import CrewBase, agent, task, crew
 from komet_content_intelligence.tools.proof_library import ProofLibraryTool
+from komet_content_intelligence.tools.wordpress_publisher import WordPressPublisherTool
+from komet_content_intelligence.tools.linkedin_publisher import LinkedInPublisherTool
 
 # Configure Claude with generous max_tokens for long content packages
 claude_llm = LLM(
@@ -31,13 +33,26 @@ def load_brand_config(brand: str = "komet") -> dict:
 
 @CrewBase
 class KometContentIntelligenceCrew:
-    """Komet Content Production Crew"""
+    """
+    Komet Content Intelligence Crew.
+
+    Accepts input 'mode':
+      - 'generate' (default): runs 4-agent content pipeline
+      - 'publish': runs publisher agent only with content_pack input
+
+    Generate mode input: content_brief
+    Publish mode input: content_pack (the approved package text)
+    """
     agents_config = "config/agents.yaml"
     tasks_config = "config/tasks.yaml"
 
     def __init__(self, brand: str = "komet"):
         self.brand_config = load_brand_config(brand)
         self.proof_tool = ProofLibraryTool()
+        self.wp_tool = WordPressPublisherTool()
+        self.li_tool = LinkedInPublisherTool()
+
+    # --- Content agents ---
 
     @agent
     def content_strategist(self) -> Agent:
@@ -72,6 +87,19 @@ class KometContentIntelligenceCrew:
             llm=claude_llm,
         )
 
+    # --- Publisher agent ---
+
+    @agent
+    def content_publisher(self) -> Agent:
+        return Agent(
+            config=self.agents_config["content_publisher"],
+            tools=[self.wp_tool, self.li_tool],
+            verbose=True,
+            llm=claude_llm,
+        )
+
+    # --- Content tasks ---
+
     @task
     def strategy_task(self) -> Task:
         return Task(config=self.tasks_config["strategy_task"])
@@ -89,11 +117,27 @@ class KometContentIntelligenceCrew:
         return Task(
             config=self.tasks_config["brand_check_task"],
             output_file="outputs/content_pack.md",
-            human_input=True,
         )
+
+    # --- Publish task ---
+
+    @task
+    def publish_task(self) -> Task:
+        return Task(config=self.tasks_config["publish_task"])
+
+    # --- Crew ---
 
     @crew
     def crew(self) -> Crew:
+        """
+        Default crew includes all agents and tasks. AMP auto-discovers this.
+        The mode input determines behaviour:
+        - mode=generate: content_brief drives the 4 content agents
+        - mode=publish: content_pack drives the publisher agent
+        When mode=generate, publisher sees no content_pack and skips.
+        When mode=publish, content agents see no content_brief and
+        the publisher handles the content_pack.
+        """
         return Crew(
             agents=self.agents,
             tasks=self.tasks,
