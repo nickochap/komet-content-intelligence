@@ -184,14 +184,8 @@ brand_check_task:
 
 publish_task:
   description: >
-    MODE CHECK: If the input mode is "generate" or content_pack is empty,
-    output exactly: "GENERATE MODE — publishing skipped. Review content in
-    Executions tab and re-run with mode=publish to publish."
-    Do NOT call any tools. Do NOT attempt to publish. Just output that message.
-
-    If mode is "publish" and content_pack contains content:
-
-    Publish the approved content package to the correct channels.
+    This task runs AFTER Nick has approved the content package via the HITL gate.
+    The Brand Guardian's approved output is your input — publish it now.
 
     Determine content type from the package:
     - If package contains an ARTICLE section: this is a blog article
@@ -221,6 +215,6 @@ publish_task:
       "errors": []
     }}
   expected_output: >
-    GENERATE MODE: skip message.
-    PUBLISH MODE: JSON log record confirming publish actions with URLs.
+    JSON log record confirming publish actions with URLs.
   agent: content_publisher
+  context: [brand_check_task]

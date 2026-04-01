@@ -36,12 +36,11 @@ class KometContentIntelligenceCrew:
     """
     Komet Content Intelligence Crew.
 
-    Accepts input 'mode':
-      - 'generate' (default): runs 4-agent content pipeline
-      - 'publish': runs publisher agent only with content_pack input
+    Single pipeline: Strategist → Writer → Critic → Brand Guardian → [HITL pause] → Publisher.
+    Brand Guardian task has human_input=True which pauses for Nick's approval via webhook.
+    After approval, Publisher continues in the same execution.
 
-    Generate mode input: content_brief
-    Publish mode input: content_pack (the approved package text)
+    Input: content_brief (topic, format, audience, product anchor)
     """
     agents_config = "config/agents.yaml"
     tasks_config = "config/tasks.yaml"
@@ -117,6 +116,7 @@ class KometContentIntelligenceCrew:
         return Task(
             config=self.tasks_config["brand_check_task"],
             output_file="outputs/content_pack.md",
+            human_input=True,
         )
 
     # --- Publish task ---
@@ -130,13 +130,8 @@ class KometContentIntelligenceCrew:
     @crew
     def crew(self) -> Crew:
         """
-        Default crew includes all agents and tasks. AMP auto-discovers this.
-        The mode input determines behaviour:
-        - mode=generate: content_brief drives the 4 content agents
-        - mode=publish: content_pack drives the publisher agent
-        When mode=generate, publisher sees no content_pack and skips.
-        When mode=publish, content agents see no content_brief and
-        the publisher handles the content_pack.
+        Single sequential pipeline with HITL pause after Brand Guardian.
+        Strategist → Writer → Critic → Brand Guardian [HITL] → Publisher.
         """
         return Crew(
             agents=self.agents,
