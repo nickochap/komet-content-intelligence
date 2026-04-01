@@ -11,8 +11,8 @@ load_dotenv()
 class PublisherCrew:
     """
     Komet Publisher Crew.
-    Runs after AMP HITL approval. Publishes directly — no content through webhooks.
-    Returns a small JSON log record for Google Sheets via n8n.
+    Runs after human approval via @human_feedback gate.
+    Creates WordPress draft + LinkedIn post. Returns JSON log record.
     """
     agents_config = "config/agents.yaml"
     tasks_config = "config/tasks.yaml"

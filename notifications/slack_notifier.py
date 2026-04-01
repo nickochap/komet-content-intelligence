@@ -1,4 +1,5 @@
 import os
+import re
 from slack_sdk import WebClient
 from slack_sdk.errors import SlackApiError
 
@@ -7,10 +8,28 @@ class SlackNotifier:
     def __init__(self):
         self.client = WebClient(token=os.getenv("SLACK_BOT_TOKEN"))
         self.content_channel = os.getenv("SLACK_CONTENT_CHANNEL", "C0AHAK5CMFB")
-        self.caden_channel = os.getenv("SLACK_CADEN_CHANNEL", "C0AGGM4225D")
+
+    def send_ideas_list(self, ideas_raw: str) -> None:
+        """Post each idea as its own Slack message so Nick can react to trigger production."""
+        ideas = self._parse_ideas(ideas_raw)
+        if not ideas:
+            self._post(
+                f":bulb: *Weekly Intelligence Report*\n\n{ideas_raw[:2000]}"
+            )
+            return
+
+        self._post(
+            f":bar_chart: *Weekly Intelligence — {len(ideas)} ideas ranked*\n"
+            f"React :white_check_mark: on any idea to start content production."
+        )
+        for i, idea in enumerate(ideas, 1):
+            self._post(
+                f":bulb: *Idea {i}:* {idea[:500]}\n"
+                f"React :white_check_mark: to produce this one."
+            )
 
     def send_content_for_approval(self, content_pack: str, topic: str, qa_scores: dict) -> bool:
-        """Gate 1 — Nick approves content quality"""
+        """Post content for Nick's review — used alongside @human_feedback."""
         avg = sum(qa_scores.values()) / len(qa_scores) if qa_scores else 0
         try:
             self.client.chat_postMessage(
@@ -20,7 +39,8 @@ class SlackNotifier:
                     f"*Topic:* {topic}\n"
                     f"*QA Average:* {avg:.1f}/5.0\n\n"
                     f"{content_pack[:2000]}\n\n"
-                    f"React :white_check_mark: to approve, :x: to reject, :arrows_counterclockwise: to request revision."
+                    f"React :white_check_mark: to approve, :x: to reject, "
+                    f":arrows_counterclockwise: to request revision."
                 ),
                 mrkdwn=True,
             )
@@ -29,29 +49,18 @@ class SlackNotifier:
             print(f"Slack error: {e}")
             return False
 
-    def send_agentforce_for_caden_review(self, content_pack: str, topic: str, reason: str) -> bool:
-        """Agentforce technical review — Caden approves before Gate 2"""
-        try:
-            self.client.chat_postMessage(
-                channel=self.caden_channel,
-                text=(
-                    f":robot_face: *Agentforce content — technical review required*\n\n"
-                    f"*Topic:* {topic}\n"
-                    f"*Review reason:* {reason}\n\n"
-                    f"Please review all Agentforce capability claims for technical accuracy "
-                    f"against current Salesforce documentation.\n\n"
-                    f"{content_pack[:2000]}\n\n"
-                    f"React :white_check_mark: to approve technical accuracy, :x: if claims need correction."
-                ),
-                mrkdwn=True,
-            )
-            return True
-        except SlackApiError as e:
-            print(f"Slack error (Caden channel): {e}")
-            return False
+    def send_publish_complete(self, topic: str, wp_url: str, linkedin_url: str) -> None:
+        """Final notification — draft ready for visual review in WordPress."""
+        parts = [f":rocket: *Content published*\n\n*Topic:* {topic}"]
+        if wp_url:
+            parts.append(f":wordpress: *WordPress draft:* {wp_url}")
+        if linkedin_url:
+            parts.append(f":linkedin: *LinkedIn post:* {linkedin_url}")
+        parts.append("\nReview the WordPress draft and hit Publish when ready.")
+        self._post("\n".join(parts))
 
     def send_error_alert(self, error_message: str, node: str = "Unknown") -> None:
-        """Error alert — matches existing n8n error format"""
+        """Error alert to content channel."""
         try:
             self.client.chat_postMessage(
                 channel=self.content_channel,
@@ -64,21 +73,32 @@ class SlackNotifier:
                 mrkdwn=True,
             )
         except SlackApiError:
-            pass  # Don't raise on notification failure
+            pass
 
-    def send_weekly_summary(self, metrics: dict) -> None:
-        """Weekly metrics summary — matches existing n8n format"""
+    def _post(self, text: str) -> None:
+        """Helper — post to content channel, swallow errors."""
         try:
             self.client.chat_postMessage(
                 channel=self.content_channel,
-                text=(
-                    f":bar_chart: *Weekly Intelligence Summary*\n\n"
-                    f"Ideas generated: {metrics.get('ideas_count', 0)}\n"
-                    f"Competitors scanned: {metrics.get('competitors_scanned', 0)}\n"
-                    f"Trend topics identified: {metrics.get('trends_count', 0)}\n\n"
-                    f"Idea list ready for review in Slack."
-                ),
+                text=text,
                 mrkdwn=True,
             )
-        except SlackApiError:
-            pass
+        except SlackApiError as e:
+            print(f"Slack error: {e}")
+
+    @staticmethod
+    def _parse_ideas(raw: str) -> list[str]:
+        """Split numbered ideas from intelligence crew output."""
+        lines = raw.strip().split("\n")
+        ideas = []
+        current = []
+        for line in lines:
+            if re.match(r"^\s*\d+[\.\)]\s", line):
+                if current:
+                    ideas.append("\n".join(current).strip())
+                current = [line]
+            elif current:
+                current.append(line)
+        if current:
+            ideas.append("\n".join(current).strip())
+        return ideas

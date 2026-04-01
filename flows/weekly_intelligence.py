@@ -1,13 +1,13 @@
 from crewai.flow.flow import Flow, listen, start
 from crews.intelligence.crew import IntelligenceCrew
 from notifications.slack_notifier import SlackNotifier
-import os
 
 
 class WeeklyIntelligenceFlow(Flow):
     """
     Weekly intelligence flow. Triggered by AMP cron (Monday 9AM AEST).
-    Runs intelligence crew, posts idea list to Slack for Nick to review.
+    Runs intelligence crew, posts each idea as a separate Slack message
+    so Nick can react to individual ones to trigger content production.
     """
 
     @start()
@@ -18,11 +18,7 @@ class WeeklyIntelligenceFlow(Flow):
 
     @listen(run_intelligence)
     def post_to_slack(self, ideas: str):
-        """Post ranked idea list to Slack for Nick to approve."""
+        """Post each idea as its own message for individual approval."""
         notifier = SlackNotifier()
-        notifier.send_weekly_summary({
-            "ideas_count": ideas.count("##"),
-            "competitors_scanned": 5,
-            "trends_count": 7,
-        })
+        notifier.send_ideas_list(ideas)
         return ideas
