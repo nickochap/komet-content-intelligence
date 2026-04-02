@@ -33,6 +33,11 @@ def approval_guardrail(result: TaskOutput) -> Tuple[bool, Any]:
                                   with Nick's feedback from thread.
         (False, "Timed out...") — no response within timeout.
     """
+    # Debug — this ALWAYS prints to AMP logs regardless of Slack success/failure
+    print(f"GUARDRAIL ENTERED — result length: {len(result.raw)}")
+    print(f"GUARDRAIL ENV — SLACK_BOT_TOKEN present: {bool(os.getenv('SLACK_BOT_TOKEN'))}")
+    print(f"GUARDRAIL ENV — SLACK_CONTENT_CHANNEL: {os.getenv('SLACK_CONTENT_CHANNEL', 'NOT SET')}")
+
     client = WebClient(token=os.getenv("SLACK_BOT_TOKEN"))
     channel = os.getenv("SLACK_CONTENT_CHANNEL", "C0AHAK5CMFB")
 
