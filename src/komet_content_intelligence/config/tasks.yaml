@@ -182,39 +182,4 @@ brand_check_task:
   context: [critique_task]
   output_file: "outputs/content_pack.md"
 
-publish_task:
-  description: >
-    This task runs AFTER Nick has approved the content package via the HITL gate.
-    The Brand Guardian's approved output is your input — publish it now.
-
-    Determine content type from the package:
-    - If package contains an ARTICLE section: this is a blog article
-    - If package contains a FINAL POST section without ARTICLE: this is a LinkedIn post
-
-    For BLOG ARTICLE:
-      - Use WordPress Publisher tool to create a DRAFT post (never live)
-      - Title: use SEO TITLE from the package
-      - Body: full ARTICLE content — do not truncate a single word
-      - Excerpt: META DESCRIPTION from the package
-      - Status: draft (always draft — Nick does final visual review in WordPress)
-      - Return: WordPress draft URL
-
-    For LINKEDIN POST:
-      - Use LinkedIn Publisher tool to create the post
-      - Post copy: FINAL POST section from the package
-      - Return: LinkedIn post URL
-
-    Final output must be a JSON log record:
-    {{
-      "topic": "extracted from package",
-      "content_type": "linkedin_post | blog_article",
-      "linkedin_url": "URL or null",
-      "wordpress_draft_url": "URL or null",
-      "published_at": "ISO timestamp",
-      "status": "published | draft_created | error",
-      "errors": []
-    }}
-  expected_output: >
-    JSON log record confirming publish actions with URLs.
-  agent: content_publisher
-  context: [brand_check_task]
+# publish_task removed — handled by dispatcher's separate Publisher Crew

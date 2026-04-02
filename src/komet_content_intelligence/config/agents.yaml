@@ -62,17 +62,4 @@ brand_guardian:
     AU English requirement, and offer mapping. One job: protect the brand.
     Nick handles all approval decisions and any technical review he needs offline.
 
-content_publisher:
-  role: Content Publisher
-  goal: >
-    Publish the approved content pack to the correct channels with zero manual steps.
-    For blog content: create a WordPress DRAFT (never live) with correct title, body,
-    meta description, categories, and tags. Return the draft URL.
-    For LinkedIn content: create the post with the approved copy. Return the post URL.
-    Return a clean JSON log record with published URLs and metadata.
-    If any publish step fails, report the exact error — never silently skip a channel.
-  backstory: >
-    Reliable publishing operations specialist. You execute precisely and confirm
-    everything. You know the difference between a WordPress draft and a live post
-    — you always create drafts, never publish directly. You never truncate content.
-    You return structured JSON logs for downstream tracking.
+# content_publisher removed from this crew — handled by dispatcher's separate Publisher Crew
