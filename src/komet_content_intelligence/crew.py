@@ -5,17 +5,14 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-# CrewAI requires OPENAI_API_KEY at import time even when using Claude
 if not os.environ.get("OPENAI_API_KEY"):
     os.environ["OPENAI_API_KEY"] = "not-used"
 
 from crewai import Agent, Task, Crew, Process, LLM
 from crewai.project import CrewBase, agent, task, crew
 from komet_content_intelligence.tools.proof_library import ProofLibraryTool
-from komet_content_intelligence.tools.wordpress_publisher import WordPressPublisherTool
-from komet_content_intelligence.tools.linkedin_publisher import LinkedInPublisherTool
+from komet_content_intelligence.guardrails import approval_guardrail
 
-# Configure Claude with generous max_tokens for long content packages
 claude_llm = LLM(
     model="anthropic/claude-sonnet-4-6",
     max_tokens=32768,
@@ -34,13 +31,10 @@ def load_brand_config(brand: str = "komet") -> dict:
 @CrewBase
 class KometContentIntelligenceCrew:
     """
-    Komet Content Intelligence Crew.
-
-    Single pipeline: Strategist → Writer → Critic → Brand Guardian → [HITL pause] → Publisher.
-    Brand Guardian task has human_input=True which pauses for Nick's approval via webhook.
-    After approval, Publisher continues in the same execution.
-
-    Input: content_brief (topic, format, audience, product anchor)
+    Komet Content Crew — 4-agent sequential pipeline.
+    Strategist → Writer → Critic → Brand Guardian.
+    Brand Guardian has a guardrail that posts to Slack and polls for
+    Nick's approval reaction before the crew completes.
     """
     agents_config = "config/agents.yaml"
     tasks_config = "config/tasks.yaml"
@@ -48,10 +42,6 @@ class KometContentIntelligenceCrew:
     def __init__(self, brand: str = "komet"):
         self.brand_config = load_brand_config(brand)
         self.proof_tool = ProofLibraryTool()
-        self.wp_tool = WordPressPublisherTool()
-        self.li_tool = LinkedInPublisherTool()
-
-    # --- Content agents ---
 
     @agent
     def content_strategist(self) -> Agent:
@@ -86,19 +76,6 @@ class KometContentIntelligenceCrew:
             llm=claude_llm,
         )
 
-    # --- Publisher agent ---
-
-    @agent
-    def content_publisher(self) -> Agent:
-        return Agent(
-            config=self.agents_config["content_publisher"],
-            tools=[self.wp_tool, self.li_tool],
-            verbose=True,
-            llm=claude_llm,
-        )
-
-    # --- Content tasks ---
-
     @task
     def strategy_task(self) -> Task:
         return Task(config=self.tasks_config["strategy_task"])
@@ -116,23 +93,12 @@ class KometContentIntelligenceCrew:
         return Task(
             config=self.tasks_config["brand_check_task"],
             output_file="outputs/content_pack.md",
-            human_input=True,
+            guardrail=approval_guardrail,
+            guardrail_max_retries=2,
         )
-
-    # --- Publish task ---
-
-    @task
-    def publish_task(self) -> Task:
-        return Task(config=self.tasks_config["publish_task"])
-
-    # --- Crew ---
 
     @crew
     def crew(self) -> Crew:
-        """
-        Single sequential pipeline with HITL pause after Brand Guardian.
-        Strategist → Writer → Critic → Brand Guardian [HITL] → Publisher.
-        """
         return Crew(
             agents=self.agents,
             tasks=self.tasks,
