@@ -49,9 +49,13 @@ def approval_guardrail(result: TaskOutput) -> Tuple[bool, Any]:
             ),
             mrkdwn=True,
         )
-    except SlackApiError as e:
-        # If Slack fails, approve anyway — don't block the pipeline on notification failure
-        print(f"Slack error posting approval request: {e}")
+    except Exception as e:
+        # Log the FULL error for debugging — print goes to AMP logs
+        print(f"GUARDRAIL SLACK ERROR [{type(e).__name__}]: {e}")
+        print(f"SLACK_BOT_TOKEN present: {bool(os.getenv('SLACK_BOT_TOKEN'))}")
+        print(f"SLACK_BOT_TOKEN starts with: {os.getenv('SLACK_BOT_TOKEN', '')[:10]}...")
+        print(f"Channel: {channel}")
+        # Auto-approve so pipeline isn't blocked — but error is logged
         return (True, {})
 
     msg_ts = msg["ts"]
