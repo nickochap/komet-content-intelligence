@@ -184,22 +184,24 @@ brand_check_task:
 
 creative_task:
   description: >
-    Generate visual assets for the APPROVED content package.
-    Read the IMAGE BRIEF section from the approved content carefully.
-    1. Generate a hero image using the Image Generator tool
-       - Follow the brief's specifications exactly (colours, layout, text, tone)
-       - Komet visual identity: dark navy + teal, professional B2B
-       - No lifestyle photography, no stock people
-       - Aspect ratio: 4:5 for LinkedIn, 16:9 for blog hero
-    2. If carousel format specified in the content: generate carousel PDF (max 8 slides)
-    3. Return all asset URLs
+    Generate a professional branded image for the APPROVED content package.
+
+    STEP 1 — Generate the base image using the Image Generator tool.
+    Pass the FULL content text (the FINAL POST or ARTICLE section) as the prompt.
+    The tool applies Komet brand styling automatically.
+    For LinkedIn posts: format='linkedin' (4:5 aspect ratio)
+    For blog articles: format='blog' (16:9 aspect ratio)
+
+    STEP 2 — Apply the Komet logo using the Logo Overlay tool.
+    Pass the image path returned from Step 1 to the Logo Overlay tool.
+    It composites the Komet logo onto the bottom-right corner.
+
+    Return the final branded image path.
 
     Output format:
-    IMAGE_URL: [url]
-    CAROUSEL_PDF_URL: [url if applicable]
+    IMAGE_PATH: [path to branded image]
   expected_output: >
-    Structured asset list with URLs for all generated visuals.
-    IMAGE_URL always present. CAROUSEL_PDF_URL if carousel was requested.
+    Path to the final branded image with Komet logo applied.
   agent: creative_director
   context: [brand_check_task]
 
