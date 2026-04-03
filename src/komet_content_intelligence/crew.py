@@ -5,23 +5,22 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-# Debug: log which env vars AMP actually provides
-for _check_key in ["OPENAI_API_KEY", "DALLE_API_KEY", "ANTHROPIC_API_KEY", "SLACK_BOT_TOKEN", "WORDPRESS_USERNAME"]:
-    _val = os.environ.get(_check_key, "")
-    print(f"ENV CHECK — {_check_key}: {'SET (' + _val[:8] + '...)' if _val else 'NOT SET'}")
-
-# Ensure OPENAI_API_KEY is set for DALL-E
-_dalle_key = os.environ.get("DALLE_API_KEY", "") or os.environ.get("OPENAI_API_KEY", "")
-if _dalle_key and _dalle_key.startswith("sk-"):
-    os.environ["OPENAI_API_KEY"] = _dalle_key
-elif not os.environ.get("OPENAI_API_KEY"):
-    os.environ["OPENAI_API_KEY"] = "not-used"
+# Ensure OPENAI_API_KEY is available for CrewAI provider detection
+# Try our custom env var names first, then fall back to not-used
+for _key_name in ["DALLE_IMAGE_KEY", "DALLE_API_KEY", "OPENAI_API_KEY"]:
+    _k = os.environ.get(_key_name, "")
+    if _k and _k.startswith("sk-"):
+        os.environ["OPENAI_API_KEY"] = _k
+        break
+else:
+    if not os.environ.get("OPENAI_API_KEY", "").startswith("sk-"):
+        os.environ["OPENAI_API_KEY"] = "not-used"
 
 from crewai import Agent, Task, Crew, Process, LLM
 from crewai.project import CrewBase, agent, task, crew
 from komet_content_intelligence.tools.proof_library import ProofLibraryTool
 from komet_content_intelligence.tools.wordpress_publisher import WordPressPublisherTool
-from crewai_tools import DallETool
+from komet_content_intelligence.tools.dalle_image import DalleImageTool
 from komet_content_intelligence.tools.contentdrips import ContentdripsTool
 from komet_content_intelligence.tools.slack_poster import SlackPosterTool
 from komet_content_intelligence.guardrails import approval_guardrail
@@ -55,7 +54,7 @@ class KometContentIntelligenceCrew:
         self.brand_config = load_brand_config(brand)
         self.proof_tool = ProofLibraryTool()
         self.wp_tool = WordPressPublisherTool()
-        self.image_tool = DallETool()
+        self.image_tool = DalleImageTool()
         self.carousel_tool = ContentdripsTool()
         self.slack_poster = SlackPosterTool()
 
