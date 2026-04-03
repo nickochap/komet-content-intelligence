@@ -30,14 +30,49 @@ def load_brand_config(brand: str = "komet") -> dict:
 @CrewBase
 class KometContentIntelligenceCrew:
     """
-    SMOKE TEST MODE — minimal crew to verify Slack integration works.
-    One agent, one task, apps=['slack'], memory=False.
+    SMOKE TEST — all agents defined for AMP auto-discovery,
+    but crew only runs the Slack test task. memory=False.
     """
     agents_config = "config/agents.yaml"
     tasks_config = "config/tasks.yaml"
 
     def __init__(self, brand: str = "komet"):
         self.brand_config = load_brand_config(brand)
+        self.proof_tool = ProofLibraryTool()
+
+    # All agents must be defined for AMP auto-discovery
+    @agent
+    def content_strategist(self) -> Agent:
+        return Agent(
+            config=self.agents_config["content_strategist"],
+            tools=[self.proof_tool],
+            verbose=True,
+            llm=claude_llm,
+        )
+
+    @agent
+    def content_writer(self) -> Agent:
+        return Agent(
+            config=self.agents_config["content_writer"],
+            verbose=True,
+            llm=claude_llm,
+        )
+
+    @agent
+    def content_critic(self) -> Agent:
+        return Agent(
+            config=self.agents_config["content_critic"],
+            verbose=True,
+            llm=claude_llm,
+        )
+
+    @agent
+    def brand_guardian(self) -> Agent:
+        return Agent(
+            config=self.agents_config["brand_guardian"],
+            verbose=True,
+            llm=claude_llm,
+        )
 
     @agent
     def slack_approval_monitor(self) -> Agent:
@@ -48,23 +83,16 @@ class KometContentIntelligenceCrew:
             apps=["slack/list_channels"],
         )
 
+    # SMOKE TEST — only the slack task runs
     @task
     def slack_approval_task(self) -> Task:
-        return Task(
-            description=(
-                "List all available Slack channels using the Slack tool. "
-                "Return the channel names and IDs you find. "
-                "This is a smoke test to verify Slack integration works."
-            ),
-            expected_output="List of Slack channel names and IDs.",
-            agent=self.slack_approval_monitor(),
-        )
+        return Task(config=self.tasks_config["slack_approval_task"])
 
     @crew
     def crew(self) -> Crew:
         return Crew(
-            agents=self.agents,
-            tasks=self.tasks,
+            agents=[self.slack_approval_monitor()],
+            tasks=[self.slack_approval_task()],
             process=Process.sequential,
             verbose=True,
             memory=False,
