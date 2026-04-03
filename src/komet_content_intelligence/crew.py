@@ -11,7 +11,6 @@ if not os.environ.get("OPENAI_API_KEY"):
 from crewai import Agent, Task, Crew, Process, LLM
 from crewai.project import CrewBase, agent, task, crew
 from komet_content_intelligence.tools.proof_library import ProofLibraryTool
-from komet_content_intelligence.guardrails import approval_guardrail
 
 claude_llm = LLM(
     model="anthropic/claude-sonnet-4-6",
@@ -31,10 +30,10 @@ def load_brand_config(brand: str = "komet") -> dict:
 @CrewBase
 class KometContentIntelligenceCrew:
     """
-    Komet Content Crew — 4-agent sequential pipeline.
-    Strategist → Writer → Critic → Brand Guardian.
-    Brand Guardian has a guardrail that posts to Slack and polls for
-    Nick's approval reaction before the crew completes.
+    Komet Content Crew — 5-agent sequential pipeline.
+    Strategist → Writer → Critic → Brand Guardian → Slack Approval Monitor.
+    The Slack Approval Monitor uses AMP's native Slack tools to post content
+    for review and wait for Nick's emoji reaction before completing.
     """
     agents_config = "config/agents.yaml"
     tasks_config = "config/tasks.yaml"
@@ -76,6 +75,18 @@ class KometContentIntelligenceCrew:
             llm=claude_llm,
         )
 
+    @agent
+    def slack_approval_monitor(self) -> Agent:
+        """
+        Uses AMP's native Slack integration (OAuth-connected).
+        No slack_sdk, no bot token env vars — AMP handles auth.
+        """
+        return Agent(
+            config=self.agents_config["slack_approval_monitor"],
+            verbose=True,
+            llm=claude_llm,
+        )
+
     @task
     def strategy_task(self) -> Task:
         return Task(config=self.tasks_config["strategy_task"])
@@ -93,9 +104,11 @@ class KometContentIntelligenceCrew:
         return Task(
             config=self.tasks_config["brand_check_task"],
             output_file="outputs/content_pack.md",
-            guardrail=approval_guardrail,
-            guardrail_max_retries=2,
         )
+
+    @task
+    def slack_approval_task(self) -> Task:
+        return Task(config=self.tasks_config["slack_approval_task"])
 
     @crew
     def crew(self) -> Crew:

@@ -182,4 +182,35 @@ brand_check_task:
   context: [critique_task]
   output_file: "outputs/content_pack.md"
 
-# publish_task removed — handled by dispatcher's separate Publisher Crew
+slack_approval_task:
+  description: >
+    STEP 1 — POST CONTENT FOR REVIEW.
+    Send the Brand Guardian's approved content package to Slack channel C0AHAK5CMFB.
+    Post a message that includes:
+    - A summary header: "📋 Content Package — Awaiting Nick's Approval"
+    - The first 1500 characters of the content package as a preview
+    - Instructions: "React ✅ to approve, ❌ to reject. Reply in thread with notes."
+
+    STEP 2 — MONITOR FOR APPROVAL.
+    Search the Slack channel for responses to your posted message.
+    Look for these approval signals:
+    - ✅ or 👍 emoji reactions on the message
+    - "APPROVED" keyword in reply threads
+    - "LOOKS GOOD" in reply threads
+
+    And these rejection signals:
+    - ❌ emoji reaction
+    - "REJECTED" keyword in reply threads
+
+    Keep searching until you find an approval or rejection signal.
+    If you find approval: return "APPROVED" followed by the FULL content package
+    from the Brand Guardian — do not modify or truncate it.
+    If you find rejection: return "REJECTED" followed by any feedback from the thread.
+
+    CRITICAL: The full content package must pass through to the next task unchanged.
+    You are a relay — you do not edit, summarise, or shorten the content.
+  expected_output: >
+    APPROVED: the complete, unmodified content package from Brand Guardian.
+    REJECTED: rejection status with Nick's feedback notes from the Slack thread.
+  agent: slack_approval_monitor
+  context: [brand_check_task]
