@@ -11,6 +11,7 @@ if not os.environ.get("OPENAI_API_KEY"):
 from crewai import Agent, Task, Crew, Process, LLM
 from crewai.project import CrewBase, agent, task, crew
 from komet_content_intelligence.tools.proof_library import ProofLibraryTool
+from komet_content_intelligence.guardrails import approval_guardrail
 
 claude_llm = LLM(
     model="anthropic/claude-sonnet-4-6",
@@ -30,8 +31,8 @@ def load_brand_config(brand: str = "komet") -> dict:
 @CrewBase
 class KometContentIntelligenceCrew:
     """
-    SMOKE TEST — all agents and tasks defined for AMP auto-discovery.
-    Crew only runs the Slack test. memory=False.
+    Komet Content Crew — 4-agent pipeline with guardrail approval gate.
+    Strategist → Writer → Critic → Brand Guardian [guardrail polls Slack].
     """
     agents_config = "config/agents.yaml"
     tasks_config = "config/tasks.yaml"
@@ -40,7 +41,6 @@ class KometContentIntelligenceCrew:
         self.brand_config = load_brand_config(brand)
         self.proof_tool = ProofLibraryTool()
 
-    # --- ALL agents must be defined for AMP ---
     @agent
     def content_strategist(self) -> Agent:
         return Agent(
@@ -80,10 +80,8 @@ class KometContentIntelligenceCrew:
             config=self.agents_config["slack_approval_monitor"],
             verbose=True,
             llm=claude_llm,
-            apps=["slack/list_channels"],
         )
 
-    # --- ALL tasks must be defined for AMP ---
     @task
     def strategy_task(self) -> Task:
         return Task(config=self.tasks_config["strategy_task"])
@@ -101,19 +99,30 @@ class KometContentIntelligenceCrew:
         return Task(
             config=self.tasks_config["brand_check_task"],
             output_file="outputs/content_pack.md",
+            guardrail=approval_guardrail,
+            guardrail_max_retries=2,
         )
 
     @task
     def slack_approval_task(self) -> Task:
         return Task(config=self.tasks_config["slack_approval_task"])
 
-    # --- SMOKE TEST: only run the Slack task ---
     @crew
     def crew(self) -> Crew:
         return Crew(
-            agents=[self.slack_approval_monitor()],
-            tasks=[self.slack_approval_task()],
+            agents=[
+                self.content_strategist(),
+                self.content_writer(),
+                self.content_critic(),
+                self.brand_guardian(),
+            ],
+            tasks=[
+                self.strategy_task(),
+                self.writing_task(),
+                self.critique_task(),
+                self.brand_check_task(),
+            ],
             process=Process.sequential,
             verbose=True,
-            memory=False,
+            memory=False,  # Disabled — OpenAI default breaks with not-used key
         )
