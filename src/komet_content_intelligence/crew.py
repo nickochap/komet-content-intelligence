@@ -5,11 +5,9 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-# Only set dummy OPENAI_API_KEY if no real key exists
-# A real key starts with 'sk-' — don't overwrite it
-_existing_key = os.environ.get("OPENAI_API_KEY", "")
-if not _existing_key or not _existing_key.startswith("sk-"):
-    os.environ["OPENAI_API_KEY"] = "not-used"
+# Don't touch OPENAI_API_KEY — AMP sets it via Environment Variables.
+# CrewAI needs it for provider detection. DALL-E needs it for image generation.
+# If missing, CrewAI will error at import — but AMP should always have it set.
 
 from crewai import Agent, Task, Crew, Process, LLM
 from crewai.project import CrewBase, agent, task, crew
