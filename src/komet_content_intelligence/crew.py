@@ -85,7 +85,7 @@ class KometContentIntelligenceCrew:
             config=self.agents_config["slack_approval_monitor"],
             verbose=True,
             llm=claude_llm,
-            apps=["slack/slack_send_message", "slack/slack_search_messages"],
+            apps=["slack/send_message", "slack/search_messages"],
         )
 
     @task
