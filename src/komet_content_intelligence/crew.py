@@ -79,12 +79,13 @@ class KometContentIntelligenceCrew:
     def slack_approval_monitor(self) -> Agent:
         """
         Uses AMP's native Slack integration (OAuth-connected).
-        No slack_sdk, no bot token env vars — AMP handles auth.
+        apps=['slack'] gives this agent all 7 Slack tools.
         """
         return Agent(
             config=self.agents_config["slack_approval_monitor"],
             verbose=True,
             llm=claude_llm,
+            apps=["slack"],
         )
 
     @task
