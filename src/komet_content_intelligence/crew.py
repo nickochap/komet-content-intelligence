@@ -30,86 +30,35 @@ def load_brand_config(brand: str = "komet") -> dict:
 @CrewBase
 class KometContentIntelligenceCrew:
     """
-    Komet Content Crew — 5-agent sequential pipeline.
-    Strategist → Writer → Critic → Brand Guardian → Slack Approval Monitor.
-    The Slack Approval Monitor uses AMP's native Slack tools to post content
-    for review and wait for Nick's emoji reaction before completing.
+    SMOKE TEST MODE — minimal crew to verify Slack integration works.
+    One agent, one task, apps=['slack'], memory=False.
     """
     agents_config = "config/agents.yaml"
     tasks_config = "config/tasks.yaml"
 
     def __init__(self, brand: str = "komet"):
         self.brand_config = load_brand_config(brand)
-        self.proof_tool = ProofLibraryTool()
-
-    @agent
-    def content_strategist(self) -> Agent:
-        return Agent(
-            config=self.agents_config["content_strategist"],
-            tools=[self.proof_tool],
-            verbose=True,
-            llm=claude_llm,
-        )
-
-    @agent
-    def content_writer(self) -> Agent:
-        return Agent(
-            config=self.agents_config["content_writer"],
-            verbose=True,
-            llm=claude_llm,
-        )
-
-    @agent
-    def content_critic(self) -> Agent:
-        return Agent(
-            config=self.agents_config["content_critic"],
-            verbose=True,
-            llm=claude_llm,
-        )
-
-    @agent
-    def brand_guardian(self) -> Agent:
-        return Agent(
-            config=self.agents_config["brand_guardian"],
-            verbose=True,
-            llm=claude_llm,
-        )
 
     @agent
     def slack_approval_monitor(self) -> Agent:
-        """
-        Uses AMP's native Slack integration (OAuth-connected).
-        apps=['slack'] gives this agent all 7 Slack tools.
-        """
         return Agent(
             config=self.agents_config["slack_approval_monitor"],
             verbose=True,
             llm=claude_llm,
-            apps=["slack/send_message", "slack/search_messages"],
-        )
-
-    @task
-    def strategy_task(self) -> Task:
-        return Task(config=self.tasks_config["strategy_task"])
-
-    @task
-    def writing_task(self) -> Task:
-        return Task(config=self.tasks_config["writing_task"])
-
-    @task
-    def critique_task(self) -> Task:
-        return Task(config=self.tasks_config["critique_task"])
-
-    @task
-    def brand_check_task(self) -> Task:
-        return Task(
-            config=self.tasks_config["brand_check_task"],
-            output_file="outputs/content_pack.md",
+            apps=["slack/list_channels"],
         )
 
     @task
     def slack_approval_task(self) -> Task:
-        return Task(config=self.tasks_config["slack_approval_task"])
+        return Task(
+            description=(
+                "List all available Slack channels using the Slack tool. "
+                "Return the channel names and IDs you find. "
+                "This is a smoke test to verify Slack integration works."
+            ),
+            expected_output="List of Slack channel names and IDs.",
+            agent=self.slack_approval_monitor(),
+        )
 
     @crew
     def crew(self) -> Crew:
@@ -118,5 +67,5 @@ class KometContentIntelligenceCrew:
             tasks=self.tasks,
             process=Process.sequential,
             verbose=True,
-            memory=True,
+            memory=False,
         )
