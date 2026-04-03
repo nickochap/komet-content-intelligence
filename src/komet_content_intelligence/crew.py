@@ -5,17 +5,17 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-# Store the real OpenAI key (for DALL-E) before potentially overwriting
-_real_openai_key = os.environ.get("OPENAI_API_KEY", "")
-if not _real_openai_key:
+# Only set dummy OPENAI_API_KEY if no real key exists
+# A real key starts with 'sk-' — don't overwrite it
+_existing_key = os.environ.get("OPENAI_API_KEY", "")
+if not _existing_key or not _existing_key.startswith("sk-"):
     os.environ["OPENAI_API_KEY"] = "not-used"
-os.environ["DALLE_API_KEY"] = _real_openai_key  # DALL-E tool reads this
 
 from crewai import Agent, Task, Crew, Process, LLM
 from crewai.project import CrewBase, agent, task, crew
 from komet_content_intelligence.tools.proof_library import ProofLibraryTool
 from komet_content_intelligence.tools.wordpress_publisher import WordPressPublisherTool
-from komet_content_intelligence.tools.dalle_image import DalleImageTool
+from crewai_tools import DallETool
 from komet_content_intelligence.tools.contentdrips import ContentdripsTool
 from komet_content_intelligence.tools.slack_poster import SlackPosterTool
 from komet_content_intelligence.guardrails import approval_guardrail
@@ -49,7 +49,7 @@ class KometContentIntelligenceCrew:
         self.brand_config = load_brand_config(brand)
         self.proof_tool = ProofLibraryTool()
         self.wp_tool = WordPressPublisherTool()
-        self.image_tool = DalleImageTool()
+        self.image_tool = DallETool()
         self.carousel_tool = ContentdripsTool()
         self.slack_poster = SlackPosterTool()
 
