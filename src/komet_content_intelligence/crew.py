@@ -11,6 +11,9 @@ if not os.environ.get("OPENAI_API_KEY"):
 from crewai import Agent, Task, Crew, Process, LLM
 from crewai.project import CrewBase, agent, task, crew
 from komet_content_intelligence.tools.proof_library import ProofLibraryTool
+from komet_content_intelligence.tools.wordpress_publisher import WordPressPublisherTool
+from komet_content_intelligence.tools.nano_banana import NanoBananaTool
+from komet_content_intelligence.tools.contentdrips import ContentdripsTool
 from komet_content_intelligence.guardrails import approval_guardrail
 
 claude_llm = LLM(
@@ -31,8 +34,9 @@ def load_brand_config(brand: str = "komet") -> dict:
 @CrewBase
 class KometContentIntelligenceCrew:
     """
-    Komet Content Crew — 4-agent pipeline with guardrail approval gate.
-    Strategist → Writer → Critic → Brand Guardian [guardrail polls Slack].
+    Komet Content Pipeline — 6 agents, sequential.
+    Strategist → Writer → Critic → Brand Guardian [guardrail: Slack approval]
+    → Creative Director → Publisher
     """
     agents_config = "config/agents.yaml"
     tasks_config = "config/tasks.yaml"
@@ -40,6 +44,11 @@ class KometContentIntelligenceCrew:
     def __init__(self, brand: str = "komet"):
         self.brand_config = load_brand_config(brand)
         self.proof_tool = ProofLibraryTool()
+        self.wp_tool = WordPressPublisherTool()
+        self.image_tool = NanoBananaTool()
+        self.carousel_tool = ContentdripsTool()
+
+    # --- All agents (AMP auto-discovery requires all to be defined) ---
 
     @agent
     def content_strategist(self) -> Agent:
@@ -75,12 +84,32 @@ class KometContentIntelligenceCrew:
         )
 
     @agent
+    def creative_director(self) -> Agent:
+        return Agent(
+            config=self.agents_config["creative_director"],
+            tools=[self.image_tool, self.carousel_tool],
+            verbose=True,
+            llm=claude_llm,
+        )
+
+    @agent
+    def content_publisher(self) -> Agent:
+        return Agent(
+            config=self.agents_config["content_publisher"],
+            tools=[self.wp_tool],
+            verbose=True,
+            llm=claude_llm,
+        )
+
+    @agent
     def slack_approval_monitor(self) -> Agent:
         return Agent(
             config=self.agents_config["slack_approval_monitor"],
             verbose=True,
             llm=claude_llm,
         )
+
+    # --- All tasks (AMP auto-discovery requires all to be defined) ---
 
     @task
     def strategy_task(self) -> Task:
@@ -104,9 +133,18 @@ class KometContentIntelligenceCrew:
         )
 
     @task
+    def creative_task(self) -> Task:
+        return Task(config=self.tasks_config["creative_task"])
+
+    @task
+    def publish_task(self) -> Task:
+        return Task(config=self.tasks_config["publish_task"])
+
+    @task
     def slack_approval_task(self) -> Task:
         return Task(config=self.tasks_config["slack_approval_task"])
 
+    # --- Crew: full pipeline ---
     @crew
     def crew(self) -> Crew:
         return Crew(
@@ -115,14 +153,18 @@ class KometContentIntelligenceCrew:
                 self.content_writer(),
                 self.content_critic(),
                 self.brand_guardian(),
+                self.creative_director(),
+                self.content_publisher(),
             ],
             tasks=[
                 self.strategy_task(),
                 self.writing_task(),
                 self.critique_task(),
                 self.brand_check_task(),
+                self.creative_task(),
+                self.publish_task(),
             ],
             process=Process.sequential,
             verbose=True,
-            memory=False,  # Disabled — OpenAI default breaks with not-used key
+            memory=False,
         )

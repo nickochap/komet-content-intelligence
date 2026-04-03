@@ -182,10 +182,65 @@ brand_check_task:
   context: [critique_task]
   output_file: "outputs/content_pack.md"
 
+creative_task:
+  description: >
+    Generate visual assets for the APPROVED content package.
+    Read the IMAGE BRIEF section from the approved content carefully.
+    1. Generate a hero image using the Image Generator tool
+       - Follow the brief's specifications exactly (colours, layout, text, tone)
+       - Komet visual identity: dark navy + teal, professional B2B
+       - No lifestyle photography, no stock people
+       - Aspect ratio: 4:5 for LinkedIn, 16:9 for blog hero
+    2. If carousel format specified in the content: generate carousel PDF (max 8 slides)
+    3. Return all asset URLs
+
+    Output format:
+    IMAGE_URL: [url]
+    CAROUSEL_PDF_URL: [url if applicable]
+  expected_output: >
+    Structured asset list with URLs for all generated visuals.
+    IMAGE_URL always present. CAROUSEL_PDF_URL if carousel was requested.
+  agent: creative_director
+  context: [brand_check_task]
+
+publish_task:
+  description: >
+    Publish the approved content package to the correct channels.
+
+    Determine content type from the package:
+    - If package contains an ARTICLE section: this is a blog article
+    - If package contains a FINAL POST section without ARTICLE: this is a LinkedIn post
+
+    For BLOG ARTICLE:
+      - Use WordPress Publisher tool to create a DRAFT post (never live)
+      - Title: use SEO TITLE from the package
+      - Body: full ARTICLE content — do not truncate a single word
+      - Excerpt: META DESCRIPTION from the package
+      - Status: draft (ALWAYS draft — Nick does final visual review in WordPress)
+      - Return: WordPress draft URL
+
+    For LINKEDIN POST:
+      - Do NOT publish directly to LinkedIn
+      - Instead, post the full FINAL POST text to Slack channel C0AHAK5CMFB
+      - Include all three FOLLOW-UP COMMENTS as separate messages in a thread
+      - Nick will copy-paste to LinkedIn manually at the right time
+      - Return: confirmation that LinkedIn text was posted to Slack
+
+    Final output must include:
+    - Topic name
+    - Content type (linkedin_post / blog_article)
+    - WordPress draft URL (if blog)
+    - Confirmation of Slack posting (if LinkedIn)
+    - Any errors encountered
+  expected_output: >
+    Summary of publish actions: WordPress draft URL and/or Slack posting confirmation.
+  agent: content_publisher
+  context: [brand_check_task, creative_task]
+
 slack_approval_task:
   description: >
-    SMOKE TEST: Use the Slack tool to list all available channels in the workspace.
-    Return the channel names and IDs you find. This verifies Slack integration works.
+    This task exists for AMP auto-discovery but is not used in the main pipeline.
+    Return "Task not active in this pipeline run."
   expected_output: >
-    List of Slack channel names and IDs from the workspace.
+    Acknowledgement message.
   agent: slack_approval_monitor
