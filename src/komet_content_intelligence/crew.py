@@ -5,8 +5,11 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-if not os.environ.get("OPENAI_API_KEY"):
+# Store the real OpenAI key (for DALL-E) before potentially overwriting
+_real_openai_key = os.environ.get("OPENAI_API_KEY", "")
+if not _real_openai_key:
     os.environ["OPENAI_API_KEY"] = "not-used"
+os.environ["DALLE_API_KEY"] = _real_openai_key  # DALL-E tool reads this
 
 from crewai import Agent, Task, Crew, Process, LLM
 from crewai.project import CrewBase, agent, task, crew

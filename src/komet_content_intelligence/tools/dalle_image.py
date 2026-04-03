@@ -20,10 +20,13 @@ class DalleImageTool(BaseTool):
     """
 
     def _run(self, prompt: str, format: str = "linkedin") -> str:
-        api_key = os.getenv("OPENAI_API_KEY")
+        # Use DALLE_API_KEY (set by crew.py from real OPENAI_API_KEY before override)
+        api_key = os.getenv("DALLE_API_KEY") or os.getenv("OPENAI_API_KEY")
 
         if not api_key or api_key == "not-used":
-            return "DALL-E error: No valid OPENAI_API_KEY configured. Set a real OpenAI API key."
+            return "DALL-E error: No valid API key. Set OPENAI_API_KEY in AMP Environment Variables."
+
+        print(f"DALL-E — using key starting with: {api_key[:12]}...")
 
         # Select size based on content format
         if format.lower() in ("blog", "blog_article", "landscape", "hero"):
