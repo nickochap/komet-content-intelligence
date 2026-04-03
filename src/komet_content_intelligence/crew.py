@@ -5,9 +5,17 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-# Don't touch OPENAI_API_KEY — AMP sets it via Environment Variables.
-# CrewAI needs it for provider detection. DALL-E needs it for image generation.
-# If missing, CrewAI will error at import — but AMP should always have it set.
+# Debug: log which env vars AMP actually provides
+for _check_key in ["OPENAI_API_KEY", "DALLE_API_KEY", "ANTHROPIC_API_KEY", "SLACK_BOT_TOKEN", "WORDPRESS_USERNAME"]:
+    _val = os.environ.get(_check_key, "")
+    print(f"ENV CHECK — {_check_key}: {'SET (' + _val[:8] + '...)' if _val else 'NOT SET'}")
+
+# Ensure OPENAI_API_KEY is set for DALL-E
+_dalle_key = os.environ.get("DALLE_API_KEY", "") or os.environ.get("OPENAI_API_KEY", "")
+if _dalle_key and _dalle_key.startswith("sk-"):
+    os.environ["OPENAI_API_KEY"] = _dalle_key
+elif not os.environ.get("OPENAI_API_KEY"):
+    os.environ["OPENAI_API_KEY"] = "not-used"
 
 from crewai import Agent, Task, Crew, Process, LLM
 from crewai.project import CrewBase, agent, task, crew
