@@ -20,13 +20,27 @@ class DalleImageTool(BaseTool):
     """
 
     def _run(self, prompt: str, format: str = "linkedin") -> str:
-        # Use DALLE_API_KEY (set by crew.py from real OPENAI_API_KEY before override)
-        api_key = os.getenv("DALLE_API_KEY") or os.getenv("OPENAI_API_KEY")
+        # Try multiple env var names — AMP may set OPENAI_API_KEY after our import
+        dalle_key = os.getenv("DALLE_API_KEY", "")
+        openai_key = os.getenv("OPENAI_API_KEY", "")
 
-        if not api_key or api_key == "not-used":
-            return "DALL-E error: No valid API key. Set OPENAI_API_KEY in AMP Environment Variables."
+        # Pick the first valid key (not empty, not 'not-used')
+        api_key = ""
+        for k in [dalle_key, openai_key]:
+            if k and k != "not-used" and k.startswith("sk-"):
+                api_key = k
+                break
 
-        print(f"DALL-E — using key starting with: {api_key[:12]}...")
+        print(f"DALL-E — DALLE_API_KEY present: {bool(dalle_key)} starts: {dalle_key[:10]}...")
+        print(f"DALL-E — OPENAI_API_KEY present: {bool(openai_key)} starts: {openai_key[:10]}...")
+        print(f"DALL-E — selected key starts: {api_key[:10]}...")
+
+        if not api_key:
+            return (
+                f"DALL-E error: No valid API key. "
+                f"DALLE_API_KEY={dalle_key[:8]}... OPENAI_API_KEY={openai_key[:8]}... "
+                f"Set a real OpenAI key (starting with sk-) in AMP Environment Variables."
+            )
 
         # Select size based on content format
         if format.lower() in ("blog", "blog_article", "landscape", "hero"):
