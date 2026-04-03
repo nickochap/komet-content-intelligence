@@ -30,8 +30,8 @@ def load_brand_config(brand: str = "komet") -> dict:
 @CrewBase
 class KometContentIntelligenceCrew:
     """
-    SMOKE TEST — all agents defined for AMP auto-discovery,
-    but crew only runs the Slack test task. memory=False.
+    SMOKE TEST — all agents and tasks defined for AMP auto-discovery.
+    Crew only runs the Slack test. memory=False.
     """
     agents_config = "config/agents.yaml"
     tasks_config = "config/tasks.yaml"
@@ -40,7 +40,7 @@ class KometContentIntelligenceCrew:
         self.brand_config = load_brand_config(brand)
         self.proof_tool = ProofLibraryTool()
 
-    # All agents must be defined for AMP auto-discovery
+    # --- ALL agents must be defined for AMP ---
     @agent
     def content_strategist(self) -> Agent:
         return Agent(
@@ -83,11 +83,31 @@ class KometContentIntelligenceCrew:
             apps=["slack/list_channels"],
         )
 
-    # SMOKE TEST — only the slack task runs
+    # --- ALL tasks must be defined for AMP ---
+    @task
+    def strategy_task(self) -> Task:
+        return Task(config=self.tasks_config["strategy_task"])
+
+    @task
+    def writing_task(self) -> Task:
+        return Task(config=self.tasks_config["writing_task"])
+
+    @task
+    def critique_task(self) -> Task:
+        return Task(config=self.tasks_config["critique_task"])
+
+    @task
+    def brand_check_task(self) -> Task:
+        return Task(
+            config=self.tasks_config["brand_check_task"],
+            output_file="outputs/content_pack.md",
+        )
+
     @task
     def slack_approval_task(self) -> Task:
         return Task(config=self.tasks_config["slack_approval_task"])
 
+    # --- SMOKE TEST: only run the Slack task ---
     @crew
     def crew(self) -> Crew:
         return Crew(
