@@ -1,17 +1,15 @@
 """
 Nano Banana 2 image generation tool for Komet content pipeline.
-Uses Google's Gemini API (Nano Banana 2 = gemini-2.0-flash-exp)
-with brand system instructions for consistent Komet visual identity.
-
-System instruction loaded from config/brands/komet.yaml ensures
-every generated image matches Komet's visual identity.
+Uses Google's Gemini API via REST (no google-genai dependency needed).
+Brand system instructions loaded from komet.yaml for consistent visual identity.
 """
 
 import os
 import base64
+import json
 import yaml
+import requests
 from pathlib import Path
-from io import BytesIO
 from crewai.tools import BaseTool
 
 
@@ -53,7 +51,7 @@ class NanoBananaTool(BaseTool):
     Input: the full content text (LinkedIn post or blog excerpt) that the image
     should accompany. The tool reads the content and produces a matching visual.
     Brand styling is applied automatically via system instructions.
-    Optional: format parameter — 'linkedin' for 4:5, 'blog' for 16:9.
+    Optional: format parameter — 'linkedin' for square, 'blog' for landscape.
     Returns: path to the generated image file.
     """
 
@@ -61,56 +59,73 @@ class NanoBananaTool(BaseTool):
         api_key = os.getenv("NANO_BANANA_API_KEY", "")
 
         if not api_key:
-            return "Image generation error: No NANO_BANANA_API_KEY configured in environment."
-
-        try:
-            from google import genai
-            from google.genai import types
-        except ImportError:
-            return "Image generation error: google-genai package not installed. Add 'google-genai' to dependencies."
-
-        # Select aspect ratio
-        if format.lower() in ("blog", "blog_article", "landscape", "hero"):
-            aspect_ratio = "16:9"
-        else:
-            aspect_ratio = "4:5"
+            return "Image generation error: No NANO_BANANA_API_KEY configured."
 
         brand_system = _load_brand_visual_prompt()
 
-        try:
-            client = genai.Client(api_key=api_key)
+        content_prompt = (
+            "Create a professional LinkedIn infographic image for this content. "
+            "Make it visually compelling for B2B education decision-makers. "
+            "Include key points as clean text overlays in the image. "
+            "Include 'gokomet.com' and a call-to-action in a footer bar.\n\n"
+            f"CONTENT:\n{prompt}"
+        )
 
-            response = client.models.generate_content(
-                model="gemini-2.0-flash-exp",
-                contents=[
-                    f"Create a professional LinkedIn infographic image for this content. "
-                    f"Make it visually compelling for B2B education decision-makers. "
-                    f"Include key points as clean text overlays in the image. "
-                    f"Include 'gokomet.com' and a call-to-action in a footer bar.\n\n"
-                    f"CONTENT:\n{prompt}"
-                ],
-                config=types.GenerateContentConfig(
-                    system_instruction=brand_system,
-                    response_modalities=["TEXT", "IMAGE"],
-                ),
+        # Use Gemini REST API directly — no google-genai dependency needed
+        url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp:generateContent?key={api_key}"
+
+        payload = {
+            "system_instruction": {
+                "parts": [{"text": brand_system}]
+            },
+            "contents": [
+                {
+                    "parts": [{"text": content_prompt}]
+                }
+            ],
+            "generationConfig": {
+                "responseModalities": ["TEXT", "IMAGE"],
+            }
+        }
+
+        try:
+            response = requests.post(
+                url,
+                headers={"Content-Type": "application/json"},
+                json=payload,
+                timeout=60,
             )
 
-            # Extract image from response
-            for part in response.candidates[0].content.parts:
-                if hasattr(part, "inline_data") and part.inline_data:
-                    img_data = part.inline_data.data
+            if response.status_code != 200:
+                return f"Image generation error (HTTP {response.status_code}): {response.text[:300]}"
+
+            data = response.json()
+            candidates = data.get("candidates", [])
+            if not candidates:
+                return "Image generation error: No candidates in response."
+
+            parts = candidates[0].get("content", {}).get("parts", [])
+
+            for part in parts:
+                if "inlineData" in part:
+                    img_b64 = part["inlineData"]["data"]
+                    img_bytes = base64.b64decode(img_b64)
+
                     img_path = Path("outputs") / "generated_image.png"
                     img_path.parent.mkdir(exist_ok=True)
                     with open(img_path, "wb") as f:
-                        f.write(img_data)
+                        f.write(img_bytes)
+
                     return f"IMAGE_GENERATED: {img_path}"
 
-            # Check for text-only response
-            text_parts = [p.text for p in response.candidates[0].content.parts if hasattr(p, "text")]
+            # No image in response — check for text
+            text_parts = [p.get("text", "") for p in parts if "text" in p]
             if text_parts:
-                return f"Image generation returned text only (no image): {text_parts[0][:200]}"
+                return f"Image generation returned text only: {text_parts[0][:200]}"
 
-            return "Image generation completed but no image was returned."
+            return "Image generation completed but no image in response."
 
+        except requests.Timeout:
+            return "Image generation error: Request timed out (60s limit)."
         except Exception as e:
-            return f"Image generation error: {str(e)[:400]}"
+            return f"Image generation error: {str(e)[:300]}"
