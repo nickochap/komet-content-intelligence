@@ -72,7 +72,8 @@ class NanoBananaTool(BaseTool):
         )
 
         # Use Gemini REST API directly — no google-genai dependency needed
-        url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp:generateContent?key={api_key}"
+        # gemini-3.1-flash-image-preview is Nano Banana 2 (requires billing enabled)
+        url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-3.1-flash-image-preview:generateContent?key={api_key}"
 
         payload = {
             "system_instruction": {
