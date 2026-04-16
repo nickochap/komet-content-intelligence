@@ -184,24 +184,31 @@ brand_check_task:
 
 creative_task:
   description: >
-    Generate a professional branded image for the APPROVED content package.
+    MANDATORY: You MUST call BOTH tools below. Do not skip either tool.
+    Do not fabricate output paths. Do not assume success without calling the tools.
 
-    STEP 1 — Generate the base image using the Image Generator tool.
-    Pass the FULL content text (the FINAL POST or ARTICLE section) as the prompt.
-    The tool applies Komet brand styling automatically.
-    For LinkedIn posts: format='linkedin' (4:5 aspect ratio)
-    For blog articles: format='blog' (16:9 aspect ratio)
+    STEP 1 — CALL THE "Image Generator" TOOL NOW.
+    Tool input: pass the FULL text of the FINAL POST section (or ARTICLE for blog)
+    from the content package as the `prompt` argument, and format='linkedin' for
+    LinkedIn posts or format='blog' for blog articles.
+    The tool will return either "IMAGE_GENERATED: <path>" or an error message.
+    If it returns an error, report the exact error in your final output — do not
+    fabricate success.
 
-    STEP 2 — Apply the Komet logo using the Logo Overlay tool.
-    Pass the image path returned from Step 1 to the Logo Overlay tool.
-    It composites the Komet logo onto the bottom-right corner.
+    STEP 2 — CALL THE "Logo Overlay" TOOL NOW.
+    Only run this if Step 1 returned a valid "IMAGE_GENERATED: <path>" result.
+    Tool input: pass the path from Step 1 as the `image_path` argument.
+    The tool will return "BRANDED_IMAGE: <path>" or an error.
 
-    Return the final branded image path.
-
-    Output format:
-    IMAGE_PATH: [path to branded image]
+    STEP 3 — Report the actual results.
+    Include in your final output:
+    - The raw response from each tool call (verbatim)
+    - If both succeeded: the final branded image path
+    - If either failed: the exact error message received
   expected_output: >
-    Path to the final branded image with Komet logo applied.
+    Raw verbatim tool outputs from both the Image Generator and Logo Overlay tools,
+    plus a final image path if both succeeded, or the error message if either failed.
+    Do not summarise; include the tool response strings directly.
   agent: creative_director
   context: [brand_check_task]
 
