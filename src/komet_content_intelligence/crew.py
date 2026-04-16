@@ -20,8 +20,7 @@ from crewai import Agent, Task, Crew, Process, LLM
 from crewai.project import CrewBase, agent, task, crew
 from komet_content_intelligence.tools.proof_library import ProofLibraryTool
 from komet_content_intelligence.tools.wordpress_publisher import WordPressPublisherTool
-from komet_content_intelligence.tools.nano_banana import NanoBananaTool
-from komet_content_intelligence.tools.logo_overlay import LogoOverlayTool
+from komet_content_intelligence.tools.branded_image import BrandedImageTool
 from komet_content_intelligence.tools.slack_poster import SlackPosterTool
 from komet_content_intelligence.guardrails import approval_guardrail
 
@@ -54,8 +53,7 @@ class KometContentIntelligenceCrew:
         self.brand_config = load_brand_config(brand)
         self.proof_tool = ProofLibraryTool()
         self.wp_tool = WordPressPublisherTool()
-        self.image_tool = NanoBananaTool()
-        self.logo_tool = LogoOverlayTool()
+        self.image_tool = BrandedImageTool()
         self.slack_poster = SlackPosterTool()
 
     # --- All agents (AMP auto-discovery requires all to be defined) ---
@@ -97,7 +95,7 @@ class KometContentIntelligenceCrew:
     def creative_director(self) -> Agent:
         return Agent(
             config=self.agents_config["creative_director"],
-            tools=[self.image_tool, self.logo_tool],
+            tools=[self.image_tool],
             verbose=True,
             llm=claude_llm,
         )

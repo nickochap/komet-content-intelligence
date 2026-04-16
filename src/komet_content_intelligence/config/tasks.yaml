@@ -184,31 +184,17 @@ brand_check_task:
 
 creative_task:
   description: >
-    MANDATORY: You MUST call BOTH tools below. Do not skip either tool.
-    Do not fabricate output paths. Do not assume success without calling the tools.
+    Call the "Generate Branded Image" tool exactly once.
 
-    STEP 1 — CALL THE "Image Generator" TOOL NOW.
-    Tool input: pass the FULL text of the FINAL POST section (or ARTICLE for blog)
-    from the content package as the `prompt` argument, and format='linkedin' for
+    Pass the FULL text of the FINAL POST section (or ARTICLE for blog articles)
+    from the content package as the `prompt` argument. Pass format='linkedin' for
     LinkedIn posts or format='blog' for blog articles.
-    The tool will return either "IMAGE_GENERATED: <path>" or an error message.
-    If it returns an error, report the exact error in your final output — do not
-    fabricate success.
 
-    STEP 2 — CALL THE "Logo Overlay" TOOL NOW.
-    Only run this if Step 1 returned a valid "IMAGE_GENERATED: <path>" result.
-    Tool input: pass the path from Step 1 as the `image_path` argument.
-    The tool will return "BRANDED_IMAGE: <path>" or an error.
-
-    STEP 3 — Report the actual results.
-    Include in your final output:
-    - The raw response from each tool call (verbatim)
-    - If both succeeded: the final branded image path
-    - If either failed: the exact error message received
+    The tool returns either "BRANDED_IMAGE: <path>" on success or
+    "ERROR: <message>" on failure. Either way, return the tool's output directly
+    as your final answer.
   expected_output: >
-    Raw verbatim tool outputs from both the Image Generator and Logo Overlay tools,
-    plus a final image path if both succeeded, or the error message if either failed.
-    Do not summarise; include the tool response strings directly.
+    The verbatim response from the Generate Branded Image tool.
   agent: creative_director
   context: [brand_check_task]
 
